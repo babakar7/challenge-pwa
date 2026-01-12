@@ -38,9 +38,13 @@ export function MealIntroScreen({
           <View style={styles.deadlineContainer}>
             <DeadlineWarning
               weekNumber={weekNumber}
-              countdown={deadlineCountdown}
+              countdown={urgency === 'blocking' ? 'Getting Started' : deadlineCountdown}
               urgency={urgency}
             />
+            {/* Description under the warning */}
+            <Text style={styles.warningSubtext}>
+              Before your challenge {weekNumber === 1 ? 'begins' : 'week starts'}, choose your meals for Week {weekNumber}.
+            </Text>
           </View>
         )}
 
@@ -62,12 +66,6 @@ export function MealIntroScreen({
               </Text>
             </View>
           )}
-
-          {/* Description */}
-          <Text style={styles.description}>
-            Before your challenge {weekNumber === 1 ? 'begins' : 'week starts'}, choose your meals
-            for Week {weekNumber}.
-          </Text>
 
           {/* Checklist */}
           <View style={styles.checklist}>
@@ -111,6 +109,12 @@ const styles = StyleSheet.create({
     maxWidth: 400,
     marginBottom: spacing.lg,
   },
+  warningSubtext: {
+    ...typography.body,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
+  },
   card: {
     backgroundColor: colors.card,
     borderRadius: borderRadius.xl,
@@ -150,13 +154,6 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: '600',
     marginLeft: spacing.xs,
-  },
-  description: {
-    ...typography.body,
-    color: colors.textSecondary,
-    textAlign: 'center',
-    marginBottom: spacing.xl,
-    lineHeight: 22,
   },
   checklist: {
     width: '100%',
