@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { WebContainer } from '@/components/ui/WebContainer';
 import { colors, spacing, borderRadius, typography } from '@/lib/constants/theme';
 import { useAppStore } from '@/lib/store/appStore';
 import { dataSync } from '@/lib/supabase/sync';
@@ -78,8 +79,9 @@ export default function CheckInScreen() {
 
   if (!canDoCheckIn) {
     return (
-      <SafeAreaView style={styles.container} edges={['bottom']}>
-        <View style={styles.lockedContainer}>
+      <WebContainer>
+        <SafeAreaView style={styles.container} edges={['bottom']}>
+          <View style={styles.lockedContainer}>
           <View style={styles.lockedIcon}>
             <Ionicons name="lock-closed" size={48} color={colors.textSecondary} />
           </View>
@@ -99,11 +101,13 @@ export default function CheckInScreen() {
             style={styles.backButton}
           />
         </View>
-      </SafeAreaView>
+        </SafeAreaView>
+      </WebContainer>
     );
   }
 
   return (
+    <WebContainer>
     <SafeAreaView style={styles.container} edges={['bottom']}>
       <KeyboardAvoidingView
         style={styles.keyboardView}
@@ -225,6 +229,7 @@ export default function CheckInScreen() {
         </View>
       </KeyboardAvoidingView>
     </SafeAreaView>
+    </WebContainer>
   );
 }
 

@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { WebContainer } from '@/components/ui/WebContainer';
 import { colors } from '@/lib/constants/theme';
 import { useAppStore } from '@/lib/store/appStore';
 import { useMealSelection } from '@/lib/hooks/useMealSelection';
@@ -452,23 +453,25 @@ export default function MealsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      {/* Week Header - hide when showing dashboard (it has its own tabs) */}
-      {!showDashboard && (
-        <WeekHeader
-          weekNumber={activeWeek}
-          currentStep={currentStep}
-          currentDay={currentStep === 'day' ? currentDay : undefined}
-          onPrevWeek={handlePrevWeek}
-          onNextWeek={handleNextWeek}
-          canGoPrevWeek={activeWeek > 1 && accessibleWeeks.includes(activeWeek - 1)}
-          canGoNextWeek={activeWeek < 4 && accessibleWeeks.includes(activeWeek + 1)}
-        />
-      )}
+    <WebContainer>
+      <SafeAreaView style={styles.container} edges={['top']}>
+        {/* Week Header - hide when showing dashboard (it has its own tabs) */}
+        {!showDashboard && (
+          <WeekHeader
+            weekNumber={activeWeek}
+            currentStep={currentStep}
+            currentDay={currentStep === 'day' ? currentDay : undefined}
+            onPrevWeek={handlePrevWeek}
+            onNextWeek={handleNextWeek}
+            canGoPrevWeek={activeWeek > 1 && accessibleWeeks.includes(activeWeek - 1)}
+            canGoNextWeek={activeWeek < 4 && accessibleWeeks.includes(activeWeek + 1)}
+          />
+        )}
 
-      {/* Main Content */}
-      {renderContent()}
-    </SafeAreaView>
+        {/* Main Content */}
+        {renderContent()}
+      </SafeAreaView>
+    </WebContainer>
   );
 }
 

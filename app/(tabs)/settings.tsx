@@ -7,9 +7,11 @@ import {
   SafeAreaView,
   Alert,
   ActivityIndicator,
+  ScrollView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { WebContainer } from '@/components/ui/WebContainer';
 import { colors, spacing, borderRadius, typography } from '@/lib/constants/theme';
 import { useAuth } from '@/lib/context/AuthContext';
 import { dataSync } from '@/lib/supabase/sync';
@@ -113,12 +115,14 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Settings</Text>
-      </View>
+    <WebContainer>
+      <SafeAreaView style={styles.container}>
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+          <View style={styles.header}>
+            <Text style={styles.title}>Settings</Text>
+          </View>
 
-      <View style={styles.content}>
+          <View style={styles.content}>
         {/* Account Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account</Text>
@@ -247,9 +251,11 @@ export default function SettingsScreen() {
               <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
             </TouchableOpacity>
           </View>
+          </View>
         </View>
-      </View>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </WebContainer>
   );
 }
 
@@ -257,6 +263,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  scrollView: {
+    flex: 1,
   },
   header: {
     paddingHorizontal: spacing.lg,

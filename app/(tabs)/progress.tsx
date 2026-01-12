@@ -1,17 +1,24 @@
 import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, ScrollView, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, useWindowDimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { LineChart } from 'react-native-chart-kit';
 import { Ionicons } from '@expo/vector-icons';
 import { format, subDays, parseISO } from 'date-fns';
 import { Card } from '@/components/ui/Card';
+import { WebContainer } from '@/components/ui/WebContainer';
 import { colors, spacing, borderRadius, typography } from '@/lib/constants/theme';
 import { useAppStore } from '@/lib/store/appStore';
-
-const screenWidth = Dimensions.get('window').width;
+import { useResponsive, MAX_CONTENT_WIDTH } from '@/lib/utils/responsive';
 
 export default function ProgressScreen() {
   const { habits, checkIns, streak, weightHistory } = useAppStore();
+  const { width: screenWidth } = useWindowDimensions();
+  const { isDesktop } = useResponsive();
+
+  // Use max content width on desktop, screen width on mobile
+  const chartWidth = isDesktop
+    ? MAX_CONTENT_WIDTH - spacing.lg * 2 - spacing.md * 2
+    : screenWidth - spacing.lg * 2 - spacing.md * 2;
 
   // Get weight data for chart (last 28 days)
   const chartData = useMemo(() => {
@@ -103,12 +110,13 @@ export default function ProgressScreen() {
   const hasData = stats.current !== null;
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.content}
-        showsVerticalScrollIndicator={false}
-      >
+    <WebContainer>
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <ScrollView
+          style={styles.scrollView}
+          contentContainerStyle={styles.content}
+          showsVerticalScrollIndicator={false}
+        >
         <Text style={styles.title}>Your Progress</Text>
 
         {!hasData ? (
@@ -127,7 +135,7 @@ export default function ProgressScreen() {
               <Text style={styles.chartSubtitle}>Last 28 days</Text>
               <LineChart
                 data={chartData}
-                width={screenWidth - spacing.lg * 2 - spacing.md * 2}
+                width={chartWidth}
                 height={200}
                 chartConfig={{
                   backgroundColor: colors.card,
@@ -253,9 +261,10 @@ export default function ProgressScreen() {
           </Card>
         )}
 
-        <View style={styles.bottomPadding} />
-      </ScrollView>
-    </SafeAreaView>
+          <View style={styles.bottomPadding} />
+        </ScrollView>
+      </SafeAreaView>
+    </WebContainer>
   );
 }
 

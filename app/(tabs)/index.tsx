@@ -13,6 +13,7 @@ import {
   DayNavigator,
 } from '@/components/dashboard';
 import { DeadlineWarning } from '@/components/meals';
+import { WebContainer } from '@/components/ui/WebContainer';
 import { useAppStore } from '@/lib/store/appStore';
 import { useMealSelectionGating } from '@/lib/hooks/useMealSelectionGating';
 import { colors, spacing, typography, borderRadius } from '@/lib/constants/theme';
@@ -53,8 +54,9 @@ export default function DashboardScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <ScrollView
+    <WebContainer>
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
@@ -101,8 +103,9 @@ export default function DashboardScreen() {
             Log your progress to unlock check-in
           </Text>
         </View>
-      </ScrollView>
-    </SafeAreaView>
+        </ScrollView>
+      </SafeAreaView>
+    </WebContainer>
   );
 }
 
