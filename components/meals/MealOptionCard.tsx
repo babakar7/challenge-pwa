@@ -1,4 +1,5 @@
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { Image } from 'expo-image';
 import { Ionicons } from '@expo/vector-icons';
 import { colors, spacing, borderRadius, typography } from '@/lib/constants/theme';
 
@@ -32,11 +33,14 @@ export function MealOptionCard({
       disabled={disabled}
       activeOpacity={0.7}
     >
-      {/* Image */}
+      {/* Image with caching and smooth loading */}
       <Image
         source={{ uri: imageUrl }}
         style={styles.image}
-        resizeMode="cover"
+        contentFit="cover"
+        transition={200}
+        cachePolicy="disk"
+        placeholder={{ blurhash: 'L6PZfSi_.AyE_3t7t7R**0o#DgR4' }}
       />
 
       {/* Content */}

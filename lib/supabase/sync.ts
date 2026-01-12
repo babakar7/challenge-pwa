@@ -774,7 +774,14 @@ class DataSync {
         .eq('user_id', userId);
       if (exerciseError) logger.error('Error deleting weekly_exercise:', exerciseError);
 
-      // 7. Clear profile data (keep the row but clear personal info)
+      // 7. Delete cohort_participants (challenge history)
+      const { error: participantsError } = await supabase
+        .from('cohort_participants')
+        .delete()
+        .eq('user_id', userId);
+      if (participantsError) logger.error('Error deleting cohort_participants:', participantsError);
+
+      // 8. Clear profile data (keep the row but clear personal info)
       const { error: profileError } = await supabase
         .from('profiles')
         .update({

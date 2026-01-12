@@ -1,5 +1,6 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { format, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/Button';
 import { DeadlineWarning } from './DeadlineWarning';
 import { colors, spacing, borderRadius, typography } from '@/lib/constants/theme';
@@ -11,6 +12,7 @@ interface MealIntroScreenProps {
   deadline?: Date | null;
   deadlineCountdown?: string;
   urgency?: DeadlineUrgency;
+  challengeStartDate?: string;
 }
 
 export function MealIntroScreen({
@@ -18,8 +20,13 @@ export function MealIntroScreen({
   onGetStarted,
   deadline,
   deadlineCountdown,
-  urgency = 'normal'
+  urgency = 'normal',
+  challengeStartDate
 }: MealIntroScreenProps) {
+  const formattedStartDate = challengeStartDate
+    ? format(parseISO(challengeStartDate), 'MMMM d, yyyy')
+    : null;
+
   return (
     <View style={styles.container}>
       {/* Deadline Warning at Top */}
@@ -41,6 +48,16 @@ export function MealIntroScreen({
 
         {/* Title */}
         <Text style={styles.title}>Select Your Meals</Text>
+
+        {/* Challenge Start Date - show for Week 1 */}
+        {weekNumber === 1 && formattedStartDate && (
+          <View style={styles.startDateBadge}>
+            <Ionicons name="calendar-outline" size={16} color={colors.primary} />
+            <Text style={styles.startDateText}>
+              Challenge starts {formattedStartDate}
+            </Text>
+          </View>
+        )}
 
         {/* Description */}
         <Text style={styles.description}>
@@ -109,6 +126,21 @@ const styles = StyleSheet.create({
     color: colors.text,
     marginBottom: spacing.md,
     textAlign: 'center',
+  },
+  startDateBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.primaryLight,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
+    borderRadius: borderRadius.full,
+    marginBottom: spacing.md,
+  },
+  startDateText: {
+    ...typography.caption,
+    color: colors.primary,
+    fontWeight: '600',
+    marginLeft: spacing.xs,
   },
   description: {
     ...typography.body,

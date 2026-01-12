@@ -1,0 +1,25 @@
+{
+  "name": "Revive Challenge",
+  "short_name": "Revive",
+  "description": "Track your 28-day wellness challenge with daily habits, meal planning, and progress tracking.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "theme_color": "#7C547D",
+  "background_color": "#FBF6F0",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

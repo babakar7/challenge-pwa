@@ -401,6 +401,7 @@ export default function MealsScreen() {
           deadline={deadline}
           deadlineCountdown={deadlineCountdown}
           urgency={getUrgency()}
+          challengeStartDate={cohort?.start_date}
         />
       );
     }
