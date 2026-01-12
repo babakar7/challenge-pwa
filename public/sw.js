@@ -1,9 +1,8 @@
 // Revive Challenge Service Worker
-const CACHE_NAME = 'revive-challenge-v1';
+const CACHE_NAME = 'revive-challenge-v2';
 
-// Assets to cache on install
+// Only cache static assets, not the HTML shell
 const PRECACHE_ASSETS = [
-  '/',
   '/manifest.json',
   '/icon-192.png',
   '/icon-512.png',
@@ -35,7 +34,7 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch event - network first, fallback to cache
+// Fetch event - network first, minimal caching
 self.addEventListener('fetch', (event) => {
   // Skip non-GET requests
   if (event.request.method !== 'GET') {
@@ -47,30 +46,30 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Don't cache navigation requests - let the app handle routing
+  if (event.request.mode === 'navigate') {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // For static assets: network first, cache fallback
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        // Clone the response before caching
-        const responseClone = response.clone();
-
-        // Cache successful responses
-        if (response.status === 200) {
+        // Only cache successful responses for static assets
+        if (response.status === 200 && event.request.url.match(/\.(js|css|png|jpg|svg|ico|woff2?)$/)) {
+          const responseClone = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
             cache.put(event.request, responseClone);
           });
         }
-
         return response;
       })
       .catch(() => {
-        // Network failed, try cache
+        // Network failed, try cache for static assets only
         return caches.match(event.request).then((cachedResponse) => {
           if (cachedResponse) {
             return cachedResponse;
-          }
-          // Return offline fallback for navigation requests
-          if (event.request.mode === 'navigate') {
-            return caches.match('/');
           }
           return new Response('Offline', { status: 503 });
         });
