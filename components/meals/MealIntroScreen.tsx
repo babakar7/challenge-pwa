@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { format, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/Button';
@@ -29,53 +29,58 @@ export function MealIntroScreen({
 
   return (
     <View style={styles.container}>
-      {/* Deadline Warning at Top */}
-      {deadline && deadlineCountdown && (
-        <View style={styles.deadlineContainer}>
-          <DeadlineWarning
-            weekNumber={weekNumber}
-            countdown={deadlineCountdown}
-            urgency={urgency}
-          />
-        </View>
-      )}
-
-      <View style={styles.card}>
-        {/* Icon */}
-        <View style={styles.iconContainer}>
-          <Ionicons name="restaurant" size={48} color={colors.primary} />
-        </View>
-
-        {/* Title */}
-        <Text style={styles.title}>Select Your Meals</Text>
-
-        {/* Challenge Start Date - show for Week 1 */}
-        {weekNumber === 1 && formattedStartDate && (
-          <View style={styles.startDateBadge}>
-            <Ionicons name="calendar-outline" size={16} color={colors.primary} />
-            <Text style={styles.startDateText}>
-              Challenge starts {formattedStartDate}
-            </Text>
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Deadline Warning at Top */}
+        {deadline && deadlineCountdown && (
+          <View style={styles.deadlineContainer}>
+            <DeadlineWarning
+              weekNumber={weekNumber}
+              countdown={deadlineCountdown}
+              urgency={urgency}
+            />
           </View>
         )}
 
-        {/* Description */}
-        <Text style={styles.description}>
-          Before your challenge {weekNumber === 1 ? 'begins' : 'week starts'}, choose your meals
-          for Week {weekNumber}.
-        </Text>
+        <View style={styles.card}>
+          {/* Icon */}
+          <View style={styles.iconContainer}>
+            <Ionicons name="restaurant" size={48} color={colors.primary} />
+          </View>
 
-        {/* Checklist */}
-        <View style={styles.checklist}>
-          <ChecklistItem text="Select lunch & dinner daily" />
-          <ChecklistItem text="Choose Option A or B" />
-          <ChecklistItem text="Pick your delivery method" />
-          <ChecklistItem text="Lock when ready" />
+          {/* Title */}
+          <Text style={styles.title}>Select Your Meals</Text>
+
+          {/* Challenge Start Date - show for Week 1 */}
+          {weekNumber === 1 && formattedStartDate && (
+            <View style={styles.startDateBadge}>
+              <Ionicons name="calendar-outline" size={16} color={colors.primary} />
+              <Text style={styles.startDateText}>
+                Challenge starts {formattedStartDate}
+              </Text>
+            </View>
+          )}
+
+          {/* Description */}
+          <Text style={styles.description}>
+            Before your challenge {weekNumber === 1 ? 'begins' : 'week starts'}, choose your meals
+            for Week {weekNumber}.
+          </Text>
+
+          {/* Checklist */}
+          <View style={styles.checklist}>
+            <ChecklistItem text="Select lunch & dinner daily" />
+            <ChecklistItem text="Choose Option A or B" />
+            <ChecklistItem text="Pick your delivery method" />
+            <ChecklistItem text="Lock when ready" />
+          </View>
+
+          {/* Get Started Button */}
+          <Button title="Get Started" onPress={onGetStarted} variant="primary" />
         </View>
-
-        {/* Get Started Button */}
-        <Button title="Get Started" onPress={onGetStarted} variant="primary" />
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -92,10 +97,14 @@ function ChecklistItem({ text }: { text: string }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.background,
+  },
+  scrollContent: {
+    flexGrow: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.xl,
-    backgroundColor: colors.background,
+    paddingBottom: spacing.xxl + spacing.xl,
   },
   deadlineContainer: {
     width: '100%',

@@ -455,7 +455,7 @@ export default function MealsScreen() {
 
   return (
     <WebContainer>
-      <SafeAreaView style={styles.container} edges={['top']}>
+      <SafeAreaView style={styles.container} edges={['top', 'bottom']}>
         {/* Week Header - hide when showing dashboard (it has its own tabs) */}
         {!showDashboard && (
           <WeekHeader
