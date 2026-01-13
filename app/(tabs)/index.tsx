@@ -1,9 +1,10 @@
 import { ScrollView, View, Text, StyleSheet, RefreshControl, Pressable } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { format } from 'date-fns';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   WeightInput,
   StepCounter,
@@ -14,14 +15,22 @@ import {
 } from '@/components/dashboard';
 import { DeadlineWarning } from '@/components/meals';
 import { WebContainer } from '@/components/ui/WebContainer';
+import { ConfettiCelebration, ConfettiCelebrationRef } from '@/components/ui/ConfettiCelebration';
 import { useAppStore } from '@/lib/store/appStore';
 import { useMealSelectionGating } from '@/lib/hooks/useMealSelectionGating';
+import { haptics } from '@/lib/services/hapticService';
 import { colors, spacing, typography, borderRadius } from '@/lib/constants/theme';
+
+const STREAK_MILESTONES = [7, 14, 21, 28];
+const MILESTONE_STORAGE_KEY = 'lastCelebratedStreak';
 
 export default function DashboardScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const today = format(new Date(), 'EEEE, MMMM d');
+  const confettiRef = useRef<ConfettiCelebrationRef>(null);
+
   const cohort = useAppStore(s => s.cohort);
+  const streak = useAppStore(s => s.streak);
   const challengeStatus = useAppStore(s => s.getChallengeStatus());
   const challengeDay = useAppStore(s => s.getChallengeDay());
   const daysRemaining = useAppStore(s => s.getChallengeDaysRemaining());
@@ -30,6 +39,33 @@ export default function DashboardScreen() {
 
   // Meal selection gating
   const { showDeadlineBanner, bannerUrgency, weekNeedingSelection, nextWeekInfo } = useMealSelectionGating();
+
+  // Streak milestone celebration
+  useEffect(() => {
+    const checkStreakMilestone = async () => {
+      const currentStreak = streak?.current_streak || 0;
+
+      // Check if current streak is a milestone
+      if (!STREAK_MILESTONES.includes(currentStreak)) return;
+
+      // Check if we've already celebrated this milestone
+      try {
+        const lastCelebrated = await AsyncStorage.getItem(MILESTONE_STORAGE_KEY);
+        const lastCelebratedStreak = lastCelebrated ? parseInt(lastCelebrated, 10) : 0;
+
+        if (currentStreak > lastCelebratedStreak) {
+          // New milestone! Celebrate!
+          await AsyncStorage.setItem(MILESTONE_STORAGE_KEY, currentStreak.toString());
+          await haptics.heavy();
+          confettiRef.current?.bigCelebrate();
+        }
+      } catch (error) {
+        // Silently fail - celebration is nice to have, not critical
+      }
+    };
+
+    checkStreakMilestone();
+  }, [streak?.current_streak]);
 
   const onRefresh = useCallback(() => {
     setRefreshing(true);
@@ -104,6 +140,9 @@ export default function DashboardScreen() {
           </Text>
         </View>
         </ScrollView>
+
+        {/* Confetti for streak milestones */}
+        <ConfettiCelebration ref={confettiRef} />
       </SafeAreaView>
     </WebContainer>
   );

@@ -17,6 +17,7 @@ import { colors, spacing, borderRadius, typography } from '@/lib/constants/theme
 import { useAppStore } from '@/lib/store/appStore';
 import { dataSync } from '@/lib/supabase/sync';
 import { Button } from '@/components/ui/Button';
+import { haptics } from '@/lib/services/hapticService';
 
 const MOOD_OPTIONS = [
   { value: 1, emoji: '😢', label: 'Struggling' },
@@ -72,6 +73,9 @@ export default function CheckInScreen() {
 
     // Use sync layer for optimistic update + background sync
     await dataSync.submitCheckIn(challengesText, selectedDate || undefined);
+
+    // Haptic feedback on success (native only)
+    await haptics.light();
 
     setIsSubmitting(false);
     router.back();

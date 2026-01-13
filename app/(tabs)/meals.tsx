@@ -9,7 +9,9 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { WebContainer } from '@/components/ui/WebContainer';
 import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
+import { ConfettiCelebration, ConfettiCelebrationRef } from '@/components/ui/ConfettiCelebration';
 import { colors } from '@/lib/constants/theme';
+import { haptics } from '@/lib/services/hapticService';
 import { useAppStore } from '@/lib/store/appStore';
 import { useMealSelection } from '@/lib/hooks/useMealSelection';
 import { logger } from '@/lib/utils/logger';
@@ -34,6 +36,7 @@ export default function MealsScreen() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showLockModal, setShowLockModal] = useState(false);
   const hasInitialized = useRef(false);
+  const confettiRef = useRef<ConfettiCelebrationRef>(null);
 
   // Get meal selection data for active week
   const {
@@ -303,7 +306,14 @@ export default function MealsScreen() {
     try {
       const success = await submitSelections();
       if (success) {
-        router.replace('/(tabs)');
+        // Celebration feedback
+        await haptics.success();
+        confettiRef.current?.celebrate();
+
+        // Delay navigation to show confetti
+        setTimeout(() => {
+          router.replace('/(tabs)');
+        }, 1500);
       } else {
         Alert.alert(
           'Error',
@@ -438,6 +448,9 @@ export default function MealsScreen() {
           onConfirm={handleConfirmLock}
           onCancel={() => setShowLockModal(false)}
         />
+
+        {/* Confetti Celebration */}
+        <ConfettiCelebration ref={confettiRef} />
       </SafeAreaView>
     </WebContainer>
   );
