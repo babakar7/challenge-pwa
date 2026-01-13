@@ -117,18 +117,12 @@ export function MealReviewScreen({
           <View style={styles.deliveryCard}>
             <View style={styles.deliveryIcon}>
               <Ionicons
-                name={deliveryPreference === 'home' ? 'home' : 'location'}
+                name="home"
                 size={24}
-                color={deliveryPreference ? colors.primary : colors.textMuted}
+                color={colors.primary}
               />
             </View>
-            <Text style={styles.deliveryText}>
-              {deliveryPreference === 'home'
-                ? 'Home Delivery'
-                : deliveryPreference === 'pickup'
-                ? 'On-site Pickup'
-                : 'Not selected'}
-            </Text>
+            <Text style={styles.deliveryText}>Home Delivery</Text>
           </View>
         </View>
 

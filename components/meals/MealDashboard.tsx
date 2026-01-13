@@ -134,16 +134,14 @@ export function MealDashboard({
           })}
         </View>
 
-        {/* Delivery Preference */}
+        {/* Delivery Method */}
         <View style={styles.deliveryCard}>
           <Ionicons
-            name={deliveryPreference === 'home' ? 'home' : 'storefront'}
+            name="home"
             size={20}
             color={colors.primary}
           />
-          <Text style={styles.deliveryText}>
-            {deliveryPreference === 'home' ? 'Home Delivery' : 'Pickup'}
-          </Text>
+          <Text style={styles.deliveryText}>Home Delivery</Text>
         </View>
 
         {/* CTA Button or Completion Message */}

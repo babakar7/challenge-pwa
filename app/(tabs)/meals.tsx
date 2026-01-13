@@ -8,6 +8,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { WebContainer } from '@/components/ui/WebContainer';
+import { ConfirmationModal } from '@/components/ui/ConfirmationModal';
 import { colors } from '@/lib/constants/theme';
 import { useAppStore } from '@/lib/store/appStore';
 import { useMealSelection } from '@/lib/hooks/useMealSelection';
@@ -16,12 +17,11 @@ import {
   WeekHeader,
   MealIntroScreen,
   DayMealSelector,
-  DeliveryPreferenceScreen,
   MealReviewScreen,
   MealDashboard,
 } from '@/components/meals';
 
-type WizardStep = 'intro' | 'day' | 'delivery' | 'review';
+type WizardStep = 'intro' | 'day' | 'review';
 
 export default function MealsScreen() {
   const router = useRouter();
@@ -32,6 +32,7 @@ export default function MealsScreen() {
   const [currentDay, setCurrentDay] = useState<1 | 2 | 3 | 4 | 5 | 6 | 7>(1);
   const [showIntro, setShowIntro] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showLockModal, setShowLockModal] = useState(false);
   const hasInitialized = useRef(false);
 
   // Get meal selection data for active week
@@ -221,10 +222,13 @@ export default function MealsScreen() {
     if (currentDay < 7) {
       setCurrentDay((d) => (d + 1) as typeof currentDay);
     } else {
-      // After day 7, go to delivery
-      setCurrentStep('delivery');
+      // After day 7, auto-set delivery to home and go to review
+      if (!deliveryPreference) {
+        setDeliveryPreference('home');
+      }
+      setCurrentStep('review');
     }
-  }, [currentDay]);
+  }, [currentDay, deliveryPreference, setDeliveryPreference]);
 
   const handleGoToDay = useCallback((day: number) => {
     setCurrentDay(day as typeof currentDay);
@@ -234,14 +238,6 @@ export default function MealsScreen() {
   const handleBackToDay7 = useCallback(() => {
     setCurrentDay(7);
     setCurrentStep('day');
-  }, []);
-
-  const handleGoToReview = useCallback(() => {
-    setCurrentStep('review');
-  }, []);
-
-  const handleBackToDelivery = useCallback(() => {
-    setCurrentStep('delivery');
   }, []);
 
   // Week navigation
@@ -287,8 +283,8 @@ export default function MealsScreen() {
     }
   }, [activeWeek, accessibleWeeks]);
 
-  // Submit handler
-  const handleSubmit = useCallback(async () => {
+  // Submit handler - shows confirmation modal
+  const handleSubmit = useCallback(() => {
     if (!hasAllSelectionsComplete) {
       Alert.alert(
         'Incomplete Selection',
@@ -297,38 +293,30 @@ export default function MealsScreen() {
       );
       return;
     }
+    setShowLockModal(true);
+  }, [hasAllSelectionsComplete]);
 
-    Alert.alert(
-      'Lock Selections',
-      `Once locked, you cannot change your Week ${activeWeek} meal selections. Are you sure?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Lock Selections',
-          onPress: async () => {
-            setIsSubmitting(true);
-            try {
-              const success = await submitSelections();
-              if (success) {
-                // Navigate to dashboard after locking
-                router.replace('/(tabs)');
-              } else {
-                Alert.alert(
-                  'Error',
-                  'Failed to lock selections. Please try again.',
-                  [{ text: 'OK' }]
-                );
-              }
-            } catch (error) {
-              Alert.alert('Error', 'An error occurred. Please try again.');
-            } finally {
-              setIsSubmitting(false);
-            }
-          },
-        },
-      ]
-    );
-  }, [activeWeek, hasAllSelectionsComplete, submitSelections]);
+  // Handle confirmed lock from modal
+  const handleConfirmLock = useCallback(async () => {
+    setShowLockModal(false);
+    setIsSubmitting(true);
+    try {
+      const success = await submitSelections();
+      if (success) {
+        router.replace('/(tabs)');
+      } else {
+        Alert.alert(
+          'Error',
+          'Failed to lock selections. Please try again.',
+          [{ text: 'OK' }]
+        );
+      }
+    } catch (error) {
+      Alert.alert('Error', 'An error occurred. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  }, [submitSelections, router]);
 
   // Determine deadline urgency
   const getUrgency = () => {
@@ -403,18 +391,6 @@ export default function MealsScreen() {
       );
     }
 
-    if (currentStep === 'delivery') {
-      return (
-        <DeliveryPreferenceScreen
-          selected={deliveryPreference}
-          onSelect={setDeliveryPreference}
-          onBack={handleBackToDay7}
-          onNext={handleGoToReview}
-          disabled={isLocked}
-        />
-      );
-    }
-
     if (currentStep === 'review') {
       return (
         <MealReviewScreen
@@ -422,7 +398,7 @@ export default function MealsScreen() {
           selections={selections}
           deliveryPreference={deliveryPreference}
           onEditDay={!isLocked ? handleGoToDay : undefined}
-          onBack={handleBackToDelivery}
+          onBack={handleBackToDay7}
           onLock={handleSubmit}
           isSubmitting={isSubmitting}
           cohortStartDate={cohort?.start_date}
@@ -451,6 +427,17 @@ export default function MealsScreen() {
 
         {/* Main Content */}
         {renderContent()}
+
+        {/* Lock Confirmation Modal */}
+        <ConfirmationModal
+          visible={showLockModal}
+          title="Lock Selections"
+          message={`Once locked, you cannot change your Week ${activeWeek} meal selections. Are you sure?`}
+          confirmText="Lock Selections"
+          cancelText="Cancel"
+          onConfirm={handleConfirmLock}
+          onCancel={() => setShowLockModal(false)}
+        />
       </SafeAreaView>
     </WebContainer>
   );
