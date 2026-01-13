@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { WebContainer } from '@/components/ui/WebContainer';
 import { colors } from '@/lib/constants/theme';
 import { useAppStore } from '@/lib/store/appStore';
@@ -23,6 +24,8 @@ import {
 type WizardStep = 'intro' | 'day' | 'delivery' | 'review';
 
 export default function MealsScreen() {
+  const router = useRouter();
+
   // Initialize with week 1, will be updated based on accessible weeks
   const [activeWeek, setActiveWeek] = useState<1 | 2 | 3 | 4>(1);
   const [currentStep, setCurrentStep] = useState<WizardStep>('intro');
@@ -307,31 +310,8 @@ export default function MealsScreen() {
             try {
               const success = await submitSelections();
               if (success) {
-                // Check if there's a next week to select
-                const nextWeek = activeWeek + 1;
-                if (nextWeek <= 4) {
-                  Alert.alert(
-                    'Success',
-                    `Week ${activeWeek} meal selections have been locked. You can now select meals for Week ${nextWeek}.`,
-                    [{
-                      text: 'Continue to Week ' + nextWeek,
-                      onPress: () => {
-                        setActiveWeek(nextWeek as 1 | 2 | 3 | 4);
-                        setShowIntro(true);
-                        setCurrentStep('intro');
-                        setCurrentDay(1);
-                      }
-                    }]
-                  );
-                } else {
-                  // All weeks complete
-                  Alert.alert(
-                    'All Done!',
-                    'You have completed meal selections for all 4 weeks.',
-                    [{ text: 'OK' }]
-                  );
-                  setCurrentStep('review');
-                }
+                // Navigate to dashboard after locking
+                router.replace('/(tabs)');
               } else {
                 Alert.alert(
                   'Error',

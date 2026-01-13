@@ -483,6 +483,9 @@ class DataSync {
   /**
    * Select a meal option (optimistic update)
    */
+  // Queue to serialize meal selection updates per week (prevents race conditions)
+  private mealSelectionQueue: Map<number, Promise<void>> = new Map();
+
   async selectMeal(
     challengeWeek: number,
     challengeDay: number,
@@ -491,11 +494,28 @@ class DataSync {
   ): Promise<void> {
     const key = `${challengeDay}_${mealType}`;
 
-    // Optimistic update
+    // Optimistic update (immediate UI feedback)
     useAppStore.getState().selectMeal(challengeWeek, challengeDay, mealType, option);
 
     if (!this.userId) return;
 
+    // Queue the DB update to prevent race conditions
+    const currentQueue = this.mealSelectionQueue.get(challengeWeek) || Promise.resolve();
+    const newQueue = currentQueue.then(() => this.saveMealSelection(challengeWeek, key, option));
+    this.mealSelectionQueue.set(challengeWeek, newQueue);
+
+    try {
+      await newQueue;
+    } catch (error) {
+      logger.error('Error in meal selection queue:', error);
+    }
+  }
+
+  private async saveMealSelection(
+    challengeWeek: number,
+    key: string,
+    option: 'A' | 'B'
+  ): Promise<void> {
     try {
       // Get current selections (also get week_start_date in case we need it)
       const { data: existing } = await supabase
