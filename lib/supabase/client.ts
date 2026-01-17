@@ -9,18 +9,19 @@ const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
 
 // Use localStorage for web/PWA, AsyncStorage for native
 // AsyncStorage can hang on web causing infinite loading after refresh
+// Storage methods must return Promises for Supabase auth
 const storage = Platform.OS === 'web'
   ? {
-      getItem: (key: string) => {
+      getItem: async (key: string): Promise<string | null> => {
         if (typeof window === 'undefined') return null;
         return window.localStorage.getItem(key);
       },
-      setItem: (key: string, value: string) => {
+      setItem: async (key: string, value: string): Promise<void> => {
         if (typeof window !== 'undefined') {
           window.localStorage.setItem(key, value);
         }
       },
-      removeItem: (key: string) => {
+      removeItem: async (key: string): Promise<void> => {
         if (typeof window !== 'undefined') {
           window.localStorage.removeItem(key);
         }
