@@ -32,16 +32,20 @@ export async function signInWithEmail(
 }
 
 export async function signOut(): Promise<{ error: AuthError | null }> {
-  const { error } = await supabase.auth.signOut();
-
-  if (error) {
-    return {
-      error: {
-        message: error.message,
-        status: error.status,
-      },
-    };
+  // Clear local storage immediately for fast UX
+  if (typeof window !== 'undefined') {
+    logger.log('signOut: Clearing local storage');
+    Object.keys(window.localStorage).forEach(key => {
+      if (key.startsWith('sb-') || key.includes('supabase')) {
+        window.localStorage.removeItem(key);
+      }
+    });
   }
+
+  // Fire and forget the server signout - don't wait for it
+  supabase.auth.signOut().catch(err => {
+    logger.log('signOut: Server signout failed (already cleared locally):', err);
+  });
 
   return { error: null };
 }

@@ -15,6 +15,7 @@ type AuthContextType = {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
+  isDataLoading: boolean; // True while user data is being loaded after auth
   signIn: (email: string, password: string) => Promise<{ error: AuthError | null }>;
   signOut: () => Promise<{ error: AuthError | null }>;
   resetPassword: (email: string) => Promise<{ error: AuthError | null }>;
@@ -27,45 +28,83 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDataLoading, setIsDataLoading] = useState(false);
 
   useEffect(() => {
-    // Get initial session with timeout to prevent infinite loading
+    // Get initial session and restore auth state
     logger.log('AuthContext: Getting initial session...');
 
-    // Safety timeout - if session restoration takes too long, proceed anyway
-    const timeoutId = setTimeout(() => {
-      logger.log('AuthContext: Session restoration timeout, proceeding without session');
-      setIsLoading(false);
-    }, 10000); // 10 second timeout
+    const initializeAuth = async () => {
+      try {
+        // First check if there's a cached session
+        const { data: { session: cachedSession } } = await supabase.auth.getSession();
+        logger.log('AuthContext: Cached session:', cachedSession ? 'exists' : 'null');
 
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      clearTimeout(timeoutId);
-      logger.log('AuthContext: Initial session:', session ? 'exists' : 'null');
-      setSession(session);
-      setUser(session?.user ?? null);
+        if (cachedSession?.user) {
+          // Refresh the session to ensure valid auth headers for RLS
+          // This is critical - without it, queries fail silently after page refresh
+          logger.log('AuthContext: Refreshing session to ensure valid auth headers...');
+          const { data: refreshData, error: refreshError } = await supabase.auth.refreshSession();
 
-      // Load user data if session exists
-      if (session?.user) {
-        logger.log('AuthContext: Loading user data for restored session...');
-        try {
-          await dataSync.loadUserData(session.user.id);
-        } catch (error) {
-          logger.error('AuthContext: Error loading user data:', error);
+          if (refreshError) {
+            logger.error('AuthContext: Session refresh failed:', refreshError);
+            setSession(null);
+            setUser(null);
+            setIsLoading(false);
+            return;
+          }
+
+          const session = refreshData?.session;
+          if (session?.user) {
+            logger.log('AuthContext: Session refreshed successfully');
+            setSession(session);
+            setUser(session.user);
+
+            // Load user data
+            logger.log('AuthContext: Loading user data for restored session...');
+            setIsDataLoading(true);
+            try {
+              await dataSync.loadUserData(session.user.id);
+              logger.log('AuthContext: User data loaded successfully');
+            } catch (loadError) {
+              logger.error('AuthContext: Error loading user data:', loadError);
+            } finally {
+              setIsDataLoading(false);
+            }
+          } else {
+            logger.log('AuthContext: No session after refresh');
+            setSession(null);
+            setUser(null);
+          }
+        } else {
+          logger.log('AuthContext: No cached session found');
+          setSession(null);
+          setUser(null);
         }
+      } catch (error) {
+        logger.error('AuthContext: Error initializing auth:', error);
+        setSession(null);
+        setUser(null);
+      } finally {
+        setIsLoading(false);
       }
+    };
 
-      setIsLoading(false);
-    }).catch((error) => {
-      clearTimeout(timeoutId);
-      logger.error('AuthContext: Error getting session:', error);
-      setIsLoading(false);
-    });
+    initializeAuth();
 
     // Listen for auth changes
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange(async (event, session) => {
       logger.log('AuthContext: Auth state changed:', event, session ? 'has session' : 'no session');
+
+      // Skip INITIAL_SESSION - we handle that in initializeAuth above
+      // This prevents a race condition where isLoading is set to false before data loads
+      if (event === 'INITIAL_SESSION') {
+        logger.log('AuthContext: Skipping INITIAL_SESSION (handled by initializeAuth)');
+        return;
+      }
+
       setSession(session);
       setUser(session?.user ?? null);
 
@@ -106,6 +145,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         session,
         isLoading,
+        isDataLoading,
         signIn,
         signOut,
         resetPassword,

@@ -9,7 +9,7 @@ import { ChallengePendingScreen } from '@/components/challenge/ChallengePendingS
 import { useMealSelectionGating } from '@/lib/hooks/useMealSelectionGating';
 
 export default function TabLayout() {
-  const { session, isLoading } = useAuth();
+  const { session, isLoading, isDataLoading } = useAuth();
   const challengeStatus = useAppStore(s => s.getChallengeStatus());
   const { shouldBlockDashboard, blockingReason, isChecking } = useMealSelectionGating();
   const pathname = usePathname();
@@ -17,8 +17,8 @@ export default function TabLayout() {
   // Check if user is on the meals screen
   const isOnMealsScreen = pathname === '/meals' || pathname === '/(tabs)/meals';
 
-  // Show loading while checking auth
-  if (isLoading) {
+  // Show loading while checking auth OR while loading user data
+  if (isLoading || isDataLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
         <ActivityIndicator size="large" color={colors.primary} />

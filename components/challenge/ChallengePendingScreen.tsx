@@ -46,6 +46,9 @@ export function ChallengePendingScreen() {
         } else {
           Alert.alert('Erreur', 'Échec de la déconnexion. Veuillez réessayer.');
         }
+      } else if (Platform.OS === 'web') {
+        // Force page reload on web to ensure clean state
+        window.location.reload();
       }
     } catch (error) {
       logger.error('Logout error:', error);
