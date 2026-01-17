@@ -47,7 +47,7 @@ export function DeadlineWarning({
       case 'urgent':
         return `Week ${weekNumber} meal selection due soon!`;
       case 'blocking':
-        return `Week ${weekNumber} meal selection overdue`;
+        return `Before your challenge begins, choose your meals for Week ${weekNumber}`;
       default:
         return `Select your Week ${weekNumber} meals`;
     }
@@ -70,7 +70,9 @@ export function DeadlineWarning({
 
       <View style={styles.content}>
         <Text style={[styles.title, urgencyStyles.title]}>{getMessage()}</Text>
-        <Text style={styles.countdown}>{countdown}</Text>
+        {urgency !== 'blocking' && (
+          <Text style={styles.countdown}>{countdown}</Text>
+        )}
       </View>
 
       {onPress && (

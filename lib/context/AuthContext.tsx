@@ -29,9 +29,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Get initial session
+    // Get initial session with timeout to prevent infinite loading
     logger.log('AuthContext: Getting initial session...');
+
+    // Safety timeout - if session restoration takes too long, proceed anyway
+    const timeoutId = setTimeout(() => {
+      logger.log('AuthContext: Session restoration timeout, proceeding without session');
+      setIsLoading(false);
+    }, 10000); // 10 second timeout
+
     supabase.auth.getSession().then(async ({ data: { session } }) => {
+      clearTimeout(timeoutId);
       logger.log('AuthContext: Initial session:', session ? 'exists' : 'null');
       setSession(session);
       setUser(session?.user ?? null);
@@ -39,9 +47,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Load user data if session exists
       if (session?.user) {
         logger.log('AuthContext: Loading user data for restored session...');
-        await dataSync.loadUserData(session.user.id);
+        try {
+          await dataSync.loadUserData(session.user.id);
+        } catch (error) {
+          logger.error('AuthContext: Error loading user data:', error);
+        }
       }
 
+      setIsLoading(false);
+    }).catch((error) => {
+      clearTimeout(timeoutId);
+      logger.error('AuthContext: Error getting session:', error);
       setIsLoading(false);
     });
 
