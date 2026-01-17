@@ -28,12 +28,13 @@ export interface Cohort {
   start_date: string;
   end_date: string;
   is_active: boolean;
+  duration_weeks: number;
 }
 
 export interface MealOption {
   id: string;
-  challenge_week: 1 | 2 | 3 | 4;
-  challenge_day: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  challenge_week: number;
+  challenge_day: number; // 1-7 within the week
   meal_type: 'lunch' | 'dinner';
   option_a_name: string;
   option_a_description: string;
@@ -46,11 +47,18 @@ export interface MealOption {
 export interface MealSelection {
   id?: string;
   user_id?: string;
-  challenge_week: 1 | 2 | 3 | 4;
+  challenge_week: number;
   selections: Record<string, 'A' | 'B'>; // key: "day_mealtype" (e.g., "1_lunch", "3_dinner")
   delivery_preference: 'home' | 'pickup' | null;
   locked: boolean;
   locked_at?: string;
+}
+
+export interface BreakfastPhoto {
+  date: string;
+  storage_path: string;
+  uploaded_at: string;
+  notes?: string;
 }
 
 interface AppState {
@@ -80,6 +88,9 @@ interface AppState {
 
   // Day navigation - for viewing/editing past days
   selectedDate: string | null; // null = today, string = 'YYYY-MM-DD'
+
+  // Breakfast photos - keyed by date (YYYY-MM-DD)
+  breakfastPhotos: Record<string, BreakfastPhoto>;
 
   // Actions
   getTodayHabits: () => DailyHabit;
@@ -112,6 +123,10 @@ interface AppState {
   getChallengeStatus: () => 'not_enrolled' | 'pending' | 'active' | 'ended';
   getChallengeDay: () => number;
   getChallengeDaysRemaining: () => number;
+
+  // Breakfast photo actions
+  setBreakfastPhoto: (date: string, photo: BreakfastPhoto | null) => void;
+  getBreakfastPhoto: (date: string) => BreakfastPhoto | null;
 }
 
 const getDateKey = (date: Date = new Date()) => format(date, 'yyyy-MM-dd');
@@ -135,6 +150,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   weightHistory: [],
   cohort: null,
   selectedDate: null, // null = viewing today
+  breakfastPhotos: {},
 
   getTodayHabits: () => {
     const today = getDateKey();
@@ -470,9 +486,10 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     const targetDate = selectedDate ? new Date(selectedDate) : new Date();
     const startDate = parseISO(cohort.start_date);
+    const totalDays = (cohort.duration_weeks || 3) * 7;
 
     const day = differenceInDays(targetDate, startDate) + 1;
-    return Math.max(1, Math.min(day, 28));
+    return Math.max(1, Math.min(day, totalDays));
   },
 
   isViewingToday: () => {
@@ -513,17 +530,40 @@ export const useAppStore = create<AppState>((set, get) => ({
 
     const today = new Date();
     const startDate = parseISO(cohort.start_date);
+    const totalDays = (cohort.duration_weeks || 3) * 7;
 
     const day = differenceInDays(today, startDate) + 1;
-    return Math.max(1, Math.min(day, 28));
+    return Math.max(1, Math.min(day, totalDays));
   },
 
   getChallengeDaysRemaining: () => {
+    const { cohort } = get();
     const challengeDay = get().getChallengeDay();
-    if (challengeDay === 0) return 0;
+    if (challengeDay === 0 || !cohort) return 0;
 
-    // 28-day challenge: remaining = total days - current day
-    const remaining = 28 - challengeDay;
+    const totalDays = (cohort.duration_weeks || 3) * 7;
+    const remaining = totalDays - challengeDay;
     return Math.max(0, remaining);
+  },
+
+  // Breakfast photo actions
+  setBreakfastPhoto: (date: string, photo: BreakfastPhoto | null) => {
+    set((state) => {
+      if (photo === null) {
+        // Remove photo for this date
+        const { [date]: _, ...rest } = state.breakfastPhotos;
+        return { breakfastPhotos: rest };
+      }
+      return {
+        breakfastPhotos: {
+          ...state.breakfastPhotos,
+          [date]: photo,
+        },
+      };
+    });
+  },
+
+  getBreakfastPhoto: (date: string) => {
+    return get().breakfastPhotos[date] || null;
   },
 }));

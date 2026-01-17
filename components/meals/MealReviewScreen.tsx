@@ -5,7 +5,7 @@ import { colors, spacing, borderRadius, typography } from '@/lib/constants/theme
 import { getWeekdayNameForChallengeDay } from '@/lib/utils/dateHelpers';
 
 interface MealReviewScreenProps {
-  weekNumber: 1 | 2 | 3 | 4;
+  weekNumber: number;
   selections: Record<string, 'A' | 'B'>;
   deliveryPreference: 'home' | 'pickup' | null;
   onEditDay?: (day: number) => void;
@@ -68,7 +68,7 @@ export function MealReviewScreen({
                 <Text style={styles.dayLabel}>Day {day}</Text>
                 <Text style={styles.dayName}>
                   {cohortStartDate
-                    ? getWeekdayNameForChallengeDay(cohortStartDate, weekNumber, day as 1 | 2 | 3 | 4 | 5 | 6 | 7)
+                    ? getWeekdayNameForChallengeDay(cohortStartDate, weekNumber, day)
                     : `Day ${day}`}
                 </Text>
               </View>

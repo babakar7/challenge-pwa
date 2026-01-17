@@ -7,8 +7,8 @@ import { getWeekdayNameForChallengeDay } from '@/lib/utils/dateHelpers';
 import type { MealOption } from '@/lib/store/appStore';
 
 interface DayMealSelectorProps {
-  weekNumber: 1 | 2 | 3 | 4;
-  currentDay: 1 | 2 | 3 | 4 | 5 | 6 | 7;
+  weekNumber: number;
+  currentDay: number;
   mealOptions: MealOption[];
   selections: Record<string, 'A' | 'B'>;
   onSelectMeal: (challengeDay: number, mealType: 'lunch' | 'dinner', option: 'A' | 'B') => void;

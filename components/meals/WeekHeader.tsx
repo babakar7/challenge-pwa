@@ -5,7 +5,7 @@ import { colors, spacing, borderRadius, typography } from '@/lib/constants/theme
 type WizardStep = 'intro' | 'day' | 'delivery' | 'review';
 
 interface WeekHeaderProps {
-  weekNumber: 1 | 2 | 3 | 4;
+  weekNumber: number;
   currentStep: WizardStep;
   currentDay?: number;
   onPrevWeek?: () => void;

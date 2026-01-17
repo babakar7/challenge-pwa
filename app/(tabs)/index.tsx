@@ -12,6 +12,7 @@ import {
   CheckInButton,
   ExerciseToggle,
   DayNavigator,
+  BreakfastPhoto,
 } from '@/components/dashboard';
 import { DeadlineWarning } from '@/components/meals';
 import { WebContainer } from '@/components/ui/WebContainer';
@@ -124,6 +125,9 @@ export default function DashboardScreen() {
         <DayNavigator />
 
         <CheckInButton disabled={isEnded || hasCheckedInForSelectedDate} selectedDate={selectedDate} />
+
+        <Text style={styles.sectionTitle}>Breakfast</Text>
+        <BreakfastPhoto disabled={isEnded || hasCheckedInForSelectedDate} selectedDate={selectedDate} />
 
         <Text style={styles.sectionTitle}>Daily Log</Text>
 

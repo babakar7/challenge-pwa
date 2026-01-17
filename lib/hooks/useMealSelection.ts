@@ -36,7 +36,7 @@ interface UseMealSelectionReturn {
   refreshData: () => Promise<void>;
 }
 
-export function useMealSelection(challengeWeek: 1 | 2 | 3 | 4): UseMealSelectionReturn {
+export function useMealSelection(challengeWeek: number): UseMealSelectionReturn {
   const [isLoading, setIsLoading] = useState(true);
 
   // Get cohort info for deadline calculation

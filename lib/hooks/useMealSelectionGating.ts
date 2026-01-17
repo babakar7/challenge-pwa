@@ -19,7 +19,7 @@ interface UseMealSelectionGatingReturn {
   blockingReason: BlockingReason;
 
   // Week needing selection
-  weekNeedingSelection: 1 | 2 | 3 | 4 | null;
+  weekNeedingSelection: number | null;
 
   // UI helpers
   showDeadlineBanner: boolean;
@@ -42,6 +42,9 @@ export function useMealSelectionGating(): UseMealSelectionGatingReturn {
   const challengeDay = useAppStore((s) => s.getChallengeDay());
   const mealSelections = useAppStore((s) => s.mealSelections);
 
+  // Get total weeks from cohort
+  const totalWeeks = cohort?.duration_weeks || 3;
+
   // Check if challenge is before start
   const isBeforeStart = useMemo(() => {
     if (!cohort?.start_date) return false;
@@ -51,14 +54,14 @@ export function useMealSelectionGating(): UseMealSelectionGatingReturn {
   // Get the next week info that needs selection
   const nextWeekInfo = useMemo(() => {
     if (!cohort?.start_date) return null;
-    return getNextSelectionWeek(cohort.start_date, challengeDay);
-  }, [cohort?.start_date, challengeDay]);
+    return getNextSelectionWeek(cohort.start_date, challengeDay, totalWeeks);
+  }, [cohort?.start_date, challengeDay, totalWeeks]);
 
   // Determine current week and check selections
   const currentWeek = useMemo(() => {
     if (challengeDay <= 0) return 1;
-    return getChallengeWeek(challengeDay);
-  }, [challengeDay]);
+    return getChallengeWeek(challengeDay, totalWeeks);
+  }, [challengeDay, totalWeeks]);
 
   // Check if user has completed selection for a given week
   const hasCompletedWeek = (weekNum: number): boolean => {
@@ -96,7 +99,7 @@ export function useMealSelectionGating(): UseMealSelectionGatingReturn {
       return {
         shouldBlockDashboard: false,
         blockingReason: null as BlockingReason,
-        weekNeedingSelection: null as (1 | 2 | 3 | 4 | null),
+        weekNeedingSelection: null,
       };
     }
 
@@ -105,7 +108,7 @@ export function useMealSelectionGating(): UseMealSelectionGatingReturn {
       return {
         shouldBlockDashboard: false,
         blockingReason: null as BlockingReason,
-        weekNeedingSelection: null as (1 | 2 | 3 | 4 | null),
+        weekNeedingSelection: null,
       };
     }
 
@@ -116,7 +119,7 @@ export function useMealSelectionGating(): UseMealSelectionGatingReturn {
         return {
           shouldBlockDashboard: true,
           blockingReason: 'first_selection_required' as BlockingReason,
-          weekNeedingSelection: 1 as (1 | 2 | 3 | 4),
+          weekNeedingSelection: 1,
         };
       }
     }
@@ -149,7 +152,7 @@ export function useMealSelectionGating(): UseMealSelectionGatingReturn {
     return {
       shouldBlockDashboard: false,
       blockingReason: null as BlockingReason,
-      weekNeedingSelection: null as (1 | 2 | 3 | 4 | null),
+      weekNeedingSelection: null,
     };
   }, [
     challengeStatus,

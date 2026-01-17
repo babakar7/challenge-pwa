@@ -28,10 +28,14 @@ type WizardStep = 'intro' | 'day' | 'review';
 export default function MealsScreen() {
   const router = useRouter();
 
+  // Get cohort for dynamic duration
+  const cohort = useAppStore((s) => s.cohort);
+  const totalWeeks = cohort?.duration_weeks || 3;
+
   // Initialize with week 1, will be updated based on accessible weeks
-  const [activeWeek, setActiveWeek] = useState<1 | 2 | 3 | 4>(1);
+  const [activeWeek, setActiveWeek] = useState<number>(1);
   const [currentStep, setCurrentStep] = useState<WizardStep>('intro');
-  const [currentDay, setCurrentDay] = useState<1 | 2 | 3 | 4 | 5 | 6 | 7>(1);
+  const [currentDay, setCurrentDay] = useState<number>(1);
   const [showIntro, setShowIntro] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showLockModal, setShowLockModal] = useState(false);
@@ -69,11 +73,11 @@ export default function MealsScreen() {
       .map(([week]) => parseInt(week));
   }, [mealSelections]);
 
-  // Calculate current challenge week (1-4) based on challenge day
+  // Calculate current challenge week based on challenge day
   const currentChallengeWeek = useMemo(() => {
     if (currentChallengeDay === 0) return 0; // Not enrolled
-    return Math.ceil(currentChallengeDay / 7) as 1 | 2 | 3 | 4;
-  }, [currentChallengeDay]);
+    return Math.min(Math.ceil(currentChallengeDay / 7), totalWeeks);
+  }, [currentChallengeDay, totalWeeks]);
 
   // Determine which weeks are accessible
   const getAccessibleWeeks = useCallback(() => {
@@ -90,11 +94,11 @@ export default function MealsScreen() {
       if (maxLockedWeek === 0) {
         // No weeks locked yet - can select Week 1
         accessible.push(1);
-      } else if (maxLockedWeek < 4) {
+      } else if (maxLockedWeek < totalWeeks) {
         // Can select the next week after the highest locked week
         accessible.push(maxLockedWeek + 1);
       }
-      // If all 4 weeks are locked, just show locked weeks (already added)
+      // If all weeks are locked, just show locked weeks (already added)
 
       return [...new Set(accessible)].sort();
     }
@@ -108,13 +112,13 @@ export default function MealsScreen() {
     }
 
     // Can ONLY access next week if current week is locked
-    if (currentChallengeWeek < 4 && lockedWeeks.includes(currentChallengeWeek)) {
+    if (currentChallengeWeek < totalWeeks && lockedWeeks.includes(currentChallengeWeek)) {
       accessible.push(currentChallengeWeek + 1);
     }
 
     // Remove duplicates and sort
     return [...new Set(accessible)].sort();
-  }, [currentChallengeDay, currentChallengeWeek, lockedWeeks]);
+  }, [currentChallengeDay, currentChallengeWeek, lockedWeeks, totalWeeks]);
 
   const accessibleWeeks = getAccessibleWeeks();
 
@@ -133,7 +137,6 @@ export default function MealsScreen() {
   }, [accessibleWeeks, lockedWeeks]);
 
   // Calculate week start date for dashboard
-  const cohort = useAppStore((s) => s.cohort);
   const weekStartDate = useMemo(() => {
     if (!cohort?.start_date) return null;
     const cohortStart = new Date(cohort.start_date);
@@ -145,7 +148,7 @@ export default function MealsScreen() {
   // Handler to start selecting next week
   const handleStartNextWeek = useCallback(() => {
     if (nextUnlockedWeek) {
-      setActiveWeek(nextUnlockedWeek as typeof activeWeek);
+      setActiveWeek(nextUnlockedWeek);
       setShowIntro(true);
       setCurrentStep('intro');
       setCurrentDay(1);
@@ -182,13 +185,13 @@ export default function MealsScreen() {
 
     if (firstUnlockedWeek && activeWeek !== firstUnlockedWeek) {
       logger.log('[MealsScreen] Redirecting to week', firstUnlockedWeek);
-      setActiveWeek(firstUnlockedWeek as typeof activeWeek);
+      setActiveWeek(firstUnlockedWeek);
       setShowIntro(true);
       setCurrentStep('intro');
       setCurrentDay(1);
     } else if (!accessibleWeeks.includes(activeWeek)) {
       logger.log('[MealsScreen] Current week not accessible, going to', accessibleWeeks[0]);
-      setActiveWeek(accessibleWeeks[0] as typeof activeWeek);
+      setActiveWeek(accessibleWeeks[0]);
     }
   }, [accessibleWeeks, lockedWeeks]);
 
@@ -217,13 +220,13 @@ export default function MealsScreen() {
 
   const handlePrevDay = useCallback(() => {
     if (currentDay > 1) {
-      setCurrentDay((d) => (d - 1) as typeof currentDay);
+      setCurrentDay((d) => d - 1);
     }
   }, [currentDay]);
 
   const handleNextDay = useCallback(() => {
     if (currentDay < 7) {
-      setCurrentDay((d) => (d + 1) as typeof currentDay);
+      setCurrentDay((d) => d + 1);
     } else {
       // After day 7, auto-set delivery to home and go to review
       if (!deliveryPreference) {
@@ -234,7 +237,7 @@ export default function MealsScreen() {
   }, [currentDay, deliveryPreference, setDeliveryPreference]);
 
   const handleGoToDay = useCallback((day: number) => {
-    setCurrentDay(day as typeof currentDay);
+    setCurrentDay(day);
     setCurrentStep('day');
   }, []);
 
@@ -247,7 +250,7 @@ export default function MealsScreen() {
   const handlePrevWeek = useCallback(() => {
     logger.log('[MealsScreen] handlePrevWeek called', { activeWeek, accessibleWeeks, lockedWeeks });
     if (activeWeek > 1) {
-      const prevWeek = (activeWeek - 1) as typeof activeWeek;
+      const prevWeek = activeWeek - 1;
       if (accessibleWeeks.includes(prevWeek)) {
         logger.log('[MealsScreen] Setting activeWeek to', prevWeek);
         setActiveWeek(prevWeek);
@@ -267,8 +270,8 @@ export default function MealsScreen() {
 
   const handleNextWeek = useCallback(() => {
     logger.log('[MealsScreen] handleNextWeek called', { activeWeek, accessibleWeeks, lockedWeeks });
-    if (activeWeek < 4) {
-      const nextWeek = (activeWeek + 1) as typeof activeWeek;
+    if (activeWeek < totalWeeks) {
+      const nextWeek = activeWeek + 1;
       if (accessibleWeeks.includes(nextWeek)) {
         logger.log('[MealsScreen] Setting activeWeek to', nextWeek);
         setActiveWeek(nextWeek);
@@ -284,7 +287,7 @@ export default function MealsScreen() {
         );
       }
     }
-  }, [activeWeek, accessibleWeeks]);
+  }, [activeWeek, accessibleWeeks, totalWeeks]);
 
   // Submit handler - shows confirmation modal
   const handleSubmit = useCallback(() => {
@@ -359,7 +362,7 @@ export default function MealsScreen() {
         <MealDashboard
           lockedWeeks={lockedWeeks}
           activeWeek={activeWeek}
-          onWeekChange={(week) => setActiveWeek(week as typeof activeWeek)}
+          onWeekChange={(week) => setActiveWeek(week)}
           selections={selections}
           mealOptions={mealOptions}
           deliveryPreference={deliveryPreference}
@@ -367,6 +370,7 @@ export default function MealsScreen() {
           onSelectNextWeek={handleStartNextWeek}
           weekStartDate={weekStartDate}
           cohortStartDate={cohort?.start_date}
+          totalWeeks={totalWeeks}
         />
       );
     }
@@ -431,7 +435,7 @@ export default function MealsScreen() {
             onPrevWeek={handlePrevWeek}
             onNextWeek={handleNextWeek}
             canGoPrevWeek={activeWeek > 1 && accessibleWeeks.includes(activeWeek - 1)}
-            canGoNextWeek={activeWeek < 4 && accessibleWeeks.includes(activeWeek + 1)}
+            canGoNextWeek={activeWeek < totalWeeks && accessibleWeeks.includes(activeWeek + 1)}
           />
         )}
 

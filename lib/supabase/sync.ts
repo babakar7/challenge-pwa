@@ -1,5 +1,5 @@
 import { supabase } from './client';
-import { useAppStore, DailyHabit, CheckIn, Streak, MealOption, MealSelection } from '@/lib/store/appStore';
+import { useAppStore, DailyHabit, CheckIn, Streak, MealOption, MealSelection, BreakfastPhoto } from '@/lib/store/appStore';
 import { format } from 'date-fns';
 import { logger } from '@/lib/utils/logger';
 
@@ -145,6 +145,9 @@ class DataSync {
 
       // Load meal selections for all weeks
       await this.loadAllMealSelections();
+
+      // Load breakfast photos
+      await this.loadBreakfastPhotos();
     } catch (error) {
       logger.error('Error loading user data:', error);
     }
@@ -167,6 +170,7 @@ class DataSync {
       mealSelections: {},
       weightHistory: [],
       cohort: null,
+      breakfastPhotos: {},
     });
   }
 
@@ -737,6 +741,185 @@ class DataSync {
     }
   }
 
+  // ==========================================
+  // BREAKFAST PHOTO METHODS
+  // ==========================================
+
+  /**
+   * Load all breakfast photos for the user
+   */
+  async loadBreakfastPhotos(): Promise<void> {
+    if (!this.userId) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('breakfast_photos')
+        .select('*')
+        .eq('user_id', this.userId)
+        .order('date', { ascending: false })
+        .limit(30);
+
+      if (error) {
+        logger.error('Error loading breakfast photos:', error);
+        return;
+      }
+
+      const breakfastPhotos: Record<string, BreakfastPhoto> = {};
+      (data || []).forEach((row) => {
+        breakfastPhotos[row.date] = {
+          date: row.date,
+          storage_path: row.storage_path,
+          uploaded_at: row.uploaded_at,
+          notes: row.notes,
+        };
+      });
+
+      useAppStore.setState({ breakfastPhotos });
+      logger.log(`loadBreakfastPhotos: Loaded ${data?.length || 0} photos`);
+    } catch (error) {
+      logger.error('Error loading breakfast photos:', error);
+    }
+  }
+
+  /**
+   * Upload a breakfast photo
+   */
+  async uploadBreakfastPhoto(
+    date: string,
+    imageUri: string
+  ): Promise<{ success: boolean; error?: string }> {
+    if (!this.userId) {
+      return { success: false, error: 'Not logged in' };
+    }
+
+    try {
+      // Fetch the image as a blob
+      const response = await fetch(imageUri);
+      const blob = await response.blob();
+
+      // Generate storage path
+      const fileExt = 'jpg';
+      const storagePath = `${this.userId}/${date}.${fileExt}`;
+
+      // Check if a photo already exists for this date and delete it
+      const existingPhoto = useAppStore.getState().breakfastPhotos[date];
+      if (existingPhoto) {
+        await supabase.storage
+          .from('breakfast-photos')
+          .remove([existingPhoto.storage_path]);
+      }
+
+      // Upload to Supabase Storage
+      const { error: uploadError } = await supabase.storage
+        .from('breakfast-photos')
+        .upload(storagePath, blob, {
+          contentType: 'image/jpeg',
+          upsert: true,
+        });
+
+      if (uploadError) {
+        logger.error('Error uploading breakfast photo:', uploadError);
+        return { success: false, error: uploadError.message };
+      }
+
+      // Save record to database
+      const { error: dbError } = await supabase.from('breakfast_photos').upsert(
+        {
+          user_id: this.userId,
+          date: date,
+          storage_path: storagePath,
+          uploaded_at: new Date().toISOString(),
+          file_size_bytes: blob.size,
+        },
+        {
+          onConflict: 'user_id,date',
+        }
+      );
+
+      if (dbError) {
+        logger.error('Error saving breakfast photo record:', dbError);
+        return { success: false, error: dbError.message };
+      }
+
+      // Update local state
+      const photo: BreakfastPhoto = {
+        date: date,
+        storage_path: storagePath,
+        uploaded_at: new Date().toISOString(),
+      };
+      useAppStore.getState().setBreakfastPhoto(date, photo);
+
+      logger.log(`uploadBreakfastPhoto: Successfully uploaded photo for ${date}`);
+      return { success: true };
+    } catch (error) {
+      logger.error('Error uploading breakfast photo:', error);
+      return { success: false, error: 'Upload failed' };
+    }
+  }
+
+  /**
+   * Delete a breakfast photo
+   */
+  async deleteBreakfastPhoto(date: string): Promise<boolean> {
+    if (!this.userId) return false;
+
+    try {
+      const existingPhoto = useAppStore.getState().breakfastPhotos[date];
+      if (!existingPhoto) return false;
+
+      // Delete from storage
+      const { error: storageError } = await supabase.storage
+        .from('breakfast-photos')
+        .remove([existingPhoto.storage_path]);
+
+      if (storageError) {
+        logger.error('Error deleting breakfast photo from storage:', storageError);
+      }
+
+      // Delete from database
+      const { error: dbError } = await supabase
+        .from('breakfast_photos')
+        .delete()
+        .eq('user_id', this.userId)
+        .eq('date', date);
+
+      if (dbError) {
+        logger.error('Error deleting breakfast photo record:', dbError);
+        return false;
+      }
+
+      // Update local state
+      useAppStore.getState().setBreakfastPhoto(date, null);
+
+      logger.log(`deleteBreakfastPhoto: Successfully deleted photo for ${date}`);
+      return true;
+    } catch (error) {
+      logger.error('Error deleting breakfast photo:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get a signed URL for viewing a breakfast photo
+   */
+  async getBreakfastPhotoUrl(storagePath: string): Promise<string | null> {
+    try {
+      const { data, error } = await supabase.storage
+        .from('breakfast-photos')
+        .createSignedUrl(storagePath, 3600); // 1 hour expiry
+
+      if (error) {
+        logger.error('Error getting breakfast photo URL:', error);
+        return null;
+      }
+
+      return data.signedUrl;
+    } catch (error) {
+      logger.error('Error getting breakfast photo URL:', error);
+      return null;
+    }
+  }
+
   /**
    * Delete all user data from the database (Apple App Store requirement)
    * Deletes data from all tables in the correct order respecting foreign keys
@@ -779,6 +962,23 @@ class DataSync {
         .delete()
         .eq('user_id', userId);
       if (mealsError) logger.error('Error deleting meal_selections:', mealsError);
+
+      // 4.5 Delete breakfast_photos (database and storage)
+      const { data: breakfastPhotos } = await supabase
+        .from('breakfast_photos')
+        .select('storage_path')
+        .eq('user_id', userId);
+
+      if (breakfastPhotos && breakfastPhotos.length > 0) {
+        const storagePaths = breakfastPhotos.map(p => p.storage_path);
+        await supabase.storage.from('breakfast-photos').remove(storagePaths);
+      }
+
+      const { error: breakfastError } = await supabase
+        .from('breakfast_photos')
+        .delete()
+        .eq('user_id', userId);
+      if (breakfastError) logger.error('Error deleting breakfast_photos:', breakfastError);
 
       // 5. Delete streaks
       const { error: streaksError } = await supabase

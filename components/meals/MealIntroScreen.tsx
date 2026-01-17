@@ -7,7 +7,7 @@ import { colors, spacing, borderRadius, typography } from '@/lib/constants/theme
 import type { DeadlineUrgency } from './DeadlineWarning';
 
 interface MealIntroScreenProps {
-  weekNumber: 1 | 2 | 3 | 4;
+  weekNumber: number;
   onGetStarted: () => void;
   deadline?: Date | null;
   deadlineCountdown?: string;

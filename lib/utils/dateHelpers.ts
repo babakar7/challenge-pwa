@@ -4,23 +4,24 @@ import { addDays, differenceInDays, differenceInHours, isBefore, parseISO, forma
  * Challenge Week Information
  */
 export interface ChallengeWeekInfo {
-  weekNumber: 1 | 2 | 3 | 4;
-  weekStartDay: number;  // 1, 8, 15, or 22
-  weekEndDay: number;    // 7, 14, 21, or 28
+  weekNumber: number;
+  weekStartDay: number;  // 1, 8, 15, 22, etc.
+  weekEndDay: number;    // 7, 14, 21, 28, etc.
   deadline: Date;        // 3 days before week starts
   isDeadlinePassed: boolean;
+  daysUntilDeadline: number;
   hoursUntilDeadline: number;
   isLessThan24Hours: boolean;
 }
 
 /**
- * Get challenge week number (1-4) from challenge day
+ * Get challenge week number from challenge day
+ * @param challengeDay - The current challenge day (1-based)
+ * @param totalWeeks - Optional total weeks in the challenge (default 3)
  */
-export function getChallengeWeek(challengeDay: number): 1 | 2 | 3 | 4 {
-  if (challengeDay <= 7) return 1;
-  if (challengeDay <= 14) return 2;
-  if (challengeDay <= 21) return 3;
-  return 4;
+export function getChallengeWeek(challengeDay: number, totalWeeks: number = 3): number {
+  const week = Math.ceil(challengeDay / 7);
+  return Math.min(week, totalWeeks);
 }
 
 /**
@@ -29,10 +30,10 @@ export function getChallengeWeek(challengeDay: number): 1 | 2 | 3 | 4 {
  */
 export function getChallengeWeekDeadline(
   cohortStartDate: string,
-  weekNumber: 1 | 2 | 3 | 4
+  weekNumber: number
 ): Date {
   const start = parseISO(cohortStartDate);
-  const weekStartDay = (weekNumber - 1) * 7 + 1; // Day 1, 8, 15, or 22
+  const weekStartDay = (weekNumber - 1) * 7 + 1;
   const weekStartDate = addDays(start, weekStartDay - 1);
   const deadline = addDays(weekStartDate, -3); // 3 days before
   // Set to end of day (11:59 PM)
@@ -45,41 +46,45 @@ export function getChallengeWeekDeadline(
  */
 export function getChallengeWeekStartDate(
   cohortStartDate: string,
-  weekNumber: 1 | 2 | 3 | 4
+  weekNumber: number
 ): Date {
   const start = parseISO(cohortStartDate);
-  const weekStartDay = (weekNumber - 1) * 7; // 0, 7, 14, or 21 days after start
+  const weekStartDay = (weekNumber - 1) * 7; // 0, 7, 14, 21, etc. days after start
   return addDays(start, weekStartDay);
 }
 
 /**
  * Get info about the next week that needs meal selection
  * Returns null if all deadlines have passed or challenge is over
+ * @param totalWeeks - Total weeks in the challenge (default 3)
  */
 export function getNextSelectionWeek(
   cohortStartDate: string,
-  currentChallengeDay: number
+  currentChallengeDay: number,
+  totalWeeks: number = 3
 ): ChallengeWeekInfo | null {
   const now = new Date();
 
   // If challenge hasn't started yet (day 0 or negative), check week 1
   const startDay = currentChallengeDay <= 0 ? 0 : currentChallengeDay;
-  const currentWeek = startDay <= 0 ? 1 : getChallengeWeek(startDay);
+  const currentWeek = startDay <= 0 ? 1 : getChallengeWeek(startDay, totalWeeks);
 
   // Check each week from current onwards
-  for (let week = currentWeek as number; week <= 4; week++) {
-    const deadline = getChallengeWeekDeadline(cohortStartDate, week as 1 | 2 | 3 | 4);
+  for (let week = currentWeek; week <= totalWeeks; week++) {
+    const deadline = getChallengeWeekDeadline(cohortStartDate, week);
     const hoursUntil = differenceInHours(deadline, now);
+    const daysUntil = differenceInDays(deadline, now);
     const isDeadlinePassed = isBefore(deadline, now);
 
     // Return info about this week if deadline hasn't passed
     // or if it just passed (for blocking purposes)
     return {
-      weekNumber: week as 1 | 2 | 3 | 4,
+      weekNumber: week,
       weekStartDay: (week - 1) * 7 + 1,
       weekEndDay: week * 7,
       deadline,
       isDeadlinePassed,
+      daysUntilDeadline: Math.max(0, daysUntil),
       hoursUntilDeadline: Math.max(0, hoursUntil),
       isLessThan24Hours: hoursUntil > 0 && hoursUntil < 24,
     };
@@ -92,18 +97,19 @@ export function getNextSelectionWeek(
  * Get all weeks that need meal selection based on current challenge day
  * Before challenge starts: only week 1
  * During challenge: current week and future weeks
+ * @param totalWeeks - Total weeks in the challenge (default 3)
  */
-export function getWeeksNeedingSelection(currentChallengeDay: number): (1 | 2 | 3 | 4)[] {
+export function getWeeksNeedingSelection(currentChallengeDay: number, totalWeeks: number = 3): number[] {
   if (currentChallengeDay <= 0) {
     // Before challenge starts, only week 1 needs selection
     return [1];
   }
 
-  const currentWeek = getChallengeWeek(currentChallengeDay);
-  const weeks: (1 | 2 | 3 | 4)[] = [];
+  const currentWeek = getChallengeWeek(currentChallengeDay, totalWeeks);
+  const weeks: number[] = [];
 
-  for (let w = currentWeek; w <= 4; w++) {
-    weeks.push(w as 1 | 2 | 3 | 4);
+  for (let w = currentWeek; w <= totalWeeks; w++) {
+    weeks.push(w);
   }
 
   return weeks;
@@ -172,14 +178,14 @@ const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', '
  * Takes into account that challenges can start on any day of the week
  *
  * @param cohortStartDate - The start date of the cohort (ISO string)
- * @param weekNumber - The week number (1-4)
+ * @param weekNumber - The week number (1, 2, 3, etc.)
  * @param dayOfWeek - The day within the week (1-7)
  * @returns The weekday name (e.g., "Saturday", "Sunday", etc.)
  */
 export function getWeekdayNameForChallengeDay(
   cohortStartDate: string,
-  weekNumber: 1 | 2 | 3 | 4,
-  dayOfWeek: 1 | 2 | 3 | 4 | 5 | 6 | 7
+  weekNumber: number,
+  dayOfWeek: number
 ): string {
   const start = parseISO(cohortStartDate);
   // Calculate the offset from the challenge start
@@ -195,14 +201,14 @@ export function getWeekdayNameForChallengeDay(
  * Get the actual date for a challenge day
  *
  * @param cohortStartDate - The start date of the cohort (ISO string)
- * @param weekNumber - The week number (1-4)
+ * @param weekNumber - The week number (1, 2, 3, etc.)
  * @param dayOfWeek - The day within the week (1-7)
  * @returns The date
  */
 export function getDateForChallengeDay(
   cohortStartDate: string,
-  weekNumber: 1 | 2 | 3 | 4,
-  dayOfWeek: 1 | 2 | 3 | 4 | 5 | 6 | 7
+  weekNumber: number,
+  dayOfWeek: number
 ): Date {
   const start = parseISO(cohortStartDate);
   const dayOffset = (weekNumber - 1) * 7 + (dayOfWeek - 1);

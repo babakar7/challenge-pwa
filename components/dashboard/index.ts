@@ -6,3 +6,4 @@ export { StreakCounter } from './StreakCounter';
 export { CheckInButton } from './CheckInButton';
 export { ExerciseToggle } from './ExerciseToggle';
 export { DayNavigator } from './DayNavigator';
+export { BreakfastPhoto } from './BreakfastPhoto';

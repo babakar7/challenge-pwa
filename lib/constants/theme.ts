@@ -39,6 +39,8 @@ export const colors = {
   stepsMuted: 'rgba(16, 185, 129, 0.12)',
   meals: '#E879A0', // Soft rose - nutrition (coordinated with palette)
   mealsMuted: 'rgba(232, 121, 160, 0.12)',
+  breakfast: '#F59E0B', // Warm amber - breakfast
+  breakfastMuted: 'rgba(245, 158, 11, 0.12)',
 };
 
 // 4px grid spacing system

@@ -16,6 +16,7 @@ interface MealDashboardProps {
   onSelectNextWeek: () => void;
   weekStartDate?: Date | null;
   cohortStartDate?: string;
+  totalWeeks?: number;
 }
 
 export function MealDashboard({
@@ -29,6 +30,7 @@ export function MealDashboard({
   onSelectNextWeek,
   weekStartDate,
   cohortStartDate,
+  totalWeeks = 3,
 }: MealDashboardProps) {
   // Get meal name from options
   const getMealName = (day: number, mealType: 'lunch' | 'dinner', option: 'A' | 'B'): string => {
@@ -49,8 +51,8 @@ export function MealDashboard({
     });
   };
 
-  // Check if all 4 weeks are locked
-  const allWeeksLocked = lockedWeeks.length === 4;
+  // Check if all weeks are locked
+  const allWeeksLocked = lockedWeeks.length === totalWeeks;
 
   return (
     <View style={styles.container}>
@@ -108,7 +110,7 @@ export function MealDashboard({
               <View key={day} style={styles.dayCard}>
                 <Text style={styles.dayName}>
                   {cohortStartDate
-                    ? getWeekdayNameForChallengeDay(cohortStartDate, activeWeek as 1 | 2 | 3 | 4, day as 1 | 2 | 3 | 4 | 5 | 6 | 7)
+                    ? getWeekdayNameForChallengeDay(cohortStartDate, activeWeek, day)
                     : `Day ${day}`}
                 </Text>
                 <View style={styles.mealsContainer}>
@@ -151,7 +153,7 @@ export function MealDashboard({
               <Ionicons name="checkmark-circle" size={32} color={colors.success} />
               <Text style={styles.completionTitle}>All Meals Selected!</Text>
               <Text style={styles.completionText}>
-                You've completed meal selections for all 4 weeks of your challenge.
+                You've completed meal selections for all {totalWeeks} weeks of your challenge.
               </Text>
             </View>
           ) : nextUnlockedWeek ? (
