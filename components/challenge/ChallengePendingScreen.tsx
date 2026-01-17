@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { format, parseISO, differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
@@ -7,11 +7,13 @@ import { fr } from 'date-fns/locale';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useAppStore } from '@/lib/store/appStore';
 import { colors, spacing, typography, borderRadius } from '@/lib/constants/theme';
+import { logger } from '@/lib/utils/logger';
 
 export function ChallengePendingScreen() {
   const { signOut } = useAuth();
   const cohort = useAppStore(s => s.cohort);
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0 });
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   useEffect(() => {
     if (!cohort) return;
@@ -34,7 +36,27 @@ export function ChallengePendingScreen() {
   }, [cohort]);
 
   const handleLogout = async () => {
-    await signOut();
+    setIsLoggingOut(true);
+    try {
+      const { error } = await signOut();
+      if (error) {
+        logger.error('Logout error:', error);
+        if (Platform.OS === 'web') {
+          window.alert('Échec de la déconnexion. Veuillez réessayer.');
+        } else {
+          Alert.alert('Erreur', 'Échec de la déconnexion. Veuillez réessayer.');
+        }
+      }
+    } catch (error) {
+      logger.error('Logout error:', error);
+      if (Platform.OS === 'web') {
+        window.alert('Échec de la déconnexion. Veuillez réessayer.');
+      } else {
+        Alert.alert('Erreur', 'Échec de la déconnexion. Veuillez réessayer.');
+      }
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   if (!cohort) return null;
@@ -76,9 +98,16 @@ export function ChallengePendingScreen() {
         <TouchableOpacity
           style={styles.logoutButton}
           onPress={handleLogout}
+          disabled={isLoggingOut}
         >
-          <Ionicons name="log-out-outline" size={20} color={colors.textSecondary} />
-          <Text style={styles.logoutText}>Se déconnecter</Text>
+          {isLoggingOut ? (
+            <ActivityIndicator size="small" color={colors.textSecondary} />
+          ) : (
+            <Ionicons name="log-out-outline" size={20} color={colors.textSecondary} />
+          )}
+          <Text style={styles.logoutText}>
+            {isLoggingOut ? 'Déconnexion...' : 'Se déconnecter'}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

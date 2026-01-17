@@ -1,15 +1,37 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/lib/context/AuthContext';
 import { colors, spacing, typography, borderRadius } from '@/lib/constants/theme';
+import { logger } from '@/lib/utils/logger';
 
 export function NotEnrolledScreen() {
   const { signOut } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const handleLogout = async () => {
-    await signOut();
+    setIsLoggingOut(true);
+    try {
+      const { error } = await signOut();
+      if (error) {
+        logger.error('Logout error:', error);
+        if (Platform.OS === 'web') {
+          window.alert('Échec de la déconnexion. Veuillez réessayer.');
+        } else {
+          Alert.alert('Erreur', 'Échec de la déconnexion. Veuillez réessayer.');
+        }
+      }
+    } catch (error) {
+      logger.error('Logout error:', error);
+      if (Platform.OS === 'web') {
+        window.alert('Échec de la déconnexion. Veuillez réessayer.');
+      } else {
+        Alert.alert('Erreur', 'Échec de la déconnexion. Veuillez réessayer.');
+      }
+    } finally {
+      setIsLoggingOut(false);
+    }
   };
 
   return (
@@ -30,9 +52,16 @@ export function NotEnrolledScreen() {
         <TouchableOpacity
           style={styles.logoutButton}
           onPress={handleLogout}
+          disabled={isLoggingOut}
         >
-          <Ionicons name="log-out-outline" size={20} color={colors.error} />
-          <Text style={styles.logoutText}>Se déconnecter</Text>
+          {isLoggingOut ? (
+            <ActivityIndicator size="small" color={colors.error} />
+          ) : (
+            <Ionicons name="log-out-outline" size={20} color={colors.error} />
+          )}
+          <Text style={styles.logoutText}>
+            {isLoggingOut ? 'Déconnexion...' : 'Se déconnecter'}
+          </Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
