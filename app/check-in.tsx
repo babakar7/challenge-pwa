@@ -20,19 +20,19 @@ import { Button } from '@/components/ui/Button';
 import { haptics } from '@/lib/services/hapticService';
 
 const MOOD_OPTIONS = [
-  { value: 1, emoji: '😢', label: 'Struggling' },
-  { value: 2, emoji: '😕', label: 'Difficult' },
-  { value: 3, emoji: '😐', label: 'Okay' },
-  { value: 4, emoji: '🙂', label: 'Good' },
-  { value: 5, emoji: '😄', label: 'Great' },
+  { value: 1, emoji: '😢', label: 'Difficile' },
+  { value: 2, emoji: '😕', label: 'Compliqué' },
+  { value: 3, emoji: '😐', label: 'Correct' },
+  { value: 4, emoji: '🙂', label: 'Bien' },
+  { value: 5, emoji: '😄', label: 'Super' },
 ];
 
 const ENERGY_OPTIONS = [
-  { value: 1, label: 'Very Low' },
-  { value: 2, label: 'Low' },
-  { value: 3, label: 'Medium' },
-  { value: 4, label: 'High' },
-  { value: 5, label: 'Very High' },
+  { value: 1, label: 'Très bas' },
+  { value: 2, label: 'Bas' },
+  { value: 3, label: 'Moyen' },
+  { value: 4, label: 'Élevé' },
+  { value: 5, label: 'Très élevé' },
 ];
 
 const getToday = () => new Date().toISOString().split('T')[0];
@@ -89,17 +89,17 @@ export default function CheckInScreen() {
           <View style={styles.lockedIcon}>
             <Ionicons name="lock-closed" size={48} color={colors.textSecondary} />
           </View>
-          <Text style={styles.lockedTitle}>Check-in Locked</Text>
+          <Text style={styles.lockedTitle}>Bilan verrouillé</Text>
           <Text style={styles.lockedText}>
-            Complete your daily log to unlock check-in.
+            Complétez votre journal quotidien pour débloquer le bilan.
           </Text>
           <View style={styles.habitsList}>
-            <HabitStatus label="Weight logged" completed={habits.weight_kg !== null} />
-            <HabitStatus label="Steps recorded" completed={habits.steps !== null && habits.steps > 0} />
-            <HabitStatus label="Meal adherence" completed={habits.meal_adherence !== null} />
+            <HabitStatus label="Poids enregistré" completed={habits.weight_kg !== null} />
+            <HabitStatus label="Pas enregistrés" completed={habits.steps !== null && habits.steps > 0} />
+            <HabitStatus label="Plan repas" completed={habits.meal_adherence !== null} />
           </View>
           <Button
-            title="Go Back"
+            title="Retour"
             variant="outline"
             onPress={() => router.back()}
             style={styles.backButton}
@@ -123,8 +123,8 @@ export default function CheckInScreen() {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>How are you feeling today?</Text>
-            <Text style={styles.sectionSubtitle}>Select your overall mood</Text>
+            <Text style={styles.sectionTitle}>Comment vous sentez-vous aujourd'hui ?</Text>
+            <Text style={styles.sectionSubtitle}>Sélectionnez votre humeur</Text>
             <View style={styles.moodContainer}>
               {MOOD_OPTIONS.map((option) => (
                 <TouchableOpacity
@@ -151,8 +151,8 @@ export default function CheckInScreen() {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Energy Level</Text>
-            <Text style={styles.sectionSubtitle}>How energetic did you feel?</Text>
+            <Text style={styles.sectionTitle}>Niveau d'énergie</Text>
+            <Text style={styles.sectionSubtitle}>Comment était votre énergie ?</Text>
             <View style={styles.energyContainer}>
               {ENERGY_OPTIONS.map((option) => (
                 <TouchableOpacity
@@ -182,13 +182,13 @@ export default function CheckInScreen() {
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Notes (Optional)</Text>
+            <Text style={styles.sectionTitle}>Notes (Optionnel)</Text>
             <Text style={styles.sectionSubtitle}>
-              Any thoughts or reflections about today?
+              Des pensées ou réflexions sur aujourd'hui ?
             </Text>
             <TextInput
               style={styles.notesInput}
-              placeholder="Write your thoughts here..."
+              placeholder="Écrivez vos pensées ici..."
               placeholderTextColor={colors.textMuted}
               multiline
               numberOfLines={4}
@@ -199,22 +199,22 @@ export default function CheckInScreen() {
           </View>
 
           <View style={styles.summarySection}>
-            <Text style={styles.summaryTitle}>Today's Summary</Text>
+            <Text style={styles.summaryTitle}>Résumé du jour</Text>
             <View style={styles.summaryGrid}>
               <SummaryItem
                 icon="scale-outline"
-                label="Weight"
+                label="Poids"
                 value={habits.weight_kg ? `${habits.weight_kg} kg` : '--'}
               />
               <SummaryItem
                 icon="footsteps-outline"
-                label="Steps"
+                label="Pas"
                 value={habits.steps ? habits.steps.toLocaleString() : '--'}
               />
               <SummaryItem
                 icon="restaurant-outline"
-                label="Meals"
-                value={habits.meal_adherence === null ? '--' : habits.meal_adherence ? 'Followed' : 'Skipped'}
+                label="Repas"
+                value={habits.meal_adherence === null ? '--' : habits.meal_adherence ? 'Suivi' : 'Non suivi'}
               />
             </View>
           </View>
@@ -222,7 +222,7 @@ export default function CheckInScreen() {
 
         <View style={styles.footer}>
           <Button
-            title={isSubmitting ? 'Submitting...' : 'Complete Check-in'}
+            title={isSubmitting ? 'Envoi en cours...' : 'Terminer le bilan'}
             onPress={handleSubmit}
             disabled={!canSubmit}
             loading={isSubmitting}

@@ -20,7 +20,7 @@ export function MealAdherence({ disabled = false, selectedDate = null }: { disab
           <View style={styles.iconContainer}>
             <Ionicons name="leaf-outline" size={18} color={colors.meals} />
           </View>
-          <Text style={styles.title}>Meal Plan</Text>
+          <Text style={styles.title}>Plan repas</Text>
           <View style={styles.lockedBadge}>
             <Ionicons name="lock-closed" size={12} color={colors.textMuted} />
           </View>
@@ -33,7 +33,7 @@ export function MealAdherence({ disabled = false, selectedDate = null }: { disab
             color={adhered === true ? colors.success : adhered === false ? colors.error : colors.textMuted}
           />
           <Text style={styles.lockedText}>
-            {adhered === true ? 'Followed' : adhered === false ? 'Skipped' : 'Not recorded'}
+            {adhered === true ? 'Suivi' : adhered === false ? 'Non suivi' : 'Non enregistré'}
           </Text>
         </View>
       </View>
@@ -46,10 +46,10 @@ export function MealAdherence({ disabled = false, selectedDate = null }: { disab
         <View style={styles.iconContainer}>
           <Ionicons name="leaf-outline" size={18} color={colors.meals} />
         </View>
-        <Text style={styles.title}>Meal Plan</Text>
+        <Text style={styles.title}>Plan repas</Text>
       </View>
 
-      <Text style={styles.question}>Did you follow your meal plan today?</Text>
+      <Text style={styles.question}>Avez-vous suivi votre plan repas aujourd'hui ?</Text>
 
       <View style={styles.toggleContainer}>
         <TouchableOpacity
@@ -71,7 +71,7 @@ export function MealAdherence({ disabled = false, selectedDate = null }: { disab
               adhered === true && styles.toggleTextActive,
             ]}
           >
-            Yes
+            Oui
           </Text>
         </TouchableOpacity>
 
@@ -94,7 +94,7 @@ export function MealAdherence({ disabled = false, selectedDate = null }: { disab
               adhered === false && styles.toggleTextActive,
             ]}
           >
-            No
+            Non
           </Text>
         </TouchableOpacity>
       </View>

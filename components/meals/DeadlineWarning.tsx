@@ -45,11 +45,11 @@ export function DeadlineWarning({
   const getMessage = () => {
     switch (urgency) {
       case 'urgent':
-        return `Week ${weekNumber} meal selection due soon!`;
+        return `Sélection repas semaine ${weekNumber} bientôt !`;
       case 'blocking':
-        return `Before your challenge begins, choose your meals for Week ${weekNumber}`;
+        return `Avant le début de votre défi, choisissez vos repas pour la semaine ${weekNumber}`;
       default:
-        return `Select your Week ${weekNumber} meals`;
+        return `Sélectionnez vos repas semaine ${weekNumber}`;
     }
   };
 

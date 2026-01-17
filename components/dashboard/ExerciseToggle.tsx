@@ -44,9 +44,9 @@ export function ExerciseToggle({ disabled = false, selectedDate = null }: { disa
             <Ionicons name="fitness-outline" size={18} color={colors.primary} />
           </View>
           <View style={styles.headerText}>
-            <Text style={styles.title}>Weekly Exercise</Text>
+            <Text style={styles.title}>Exercice hebdo</Text>
             <View style={styles.badge}>
-              <Text style={styles.badgeText}>Sunday</Text>
+              <Text style={styles.badgeText}>Dimanche</Text>
             </View>
           </View>
           <View style={styles.lockedBadge}>
@@ -61,7 +61,7 @@ export function ExerciseToggle({ disabled = false, selectedDate = null }: { disa
             color={completed === true ? colors.success : completed === false ? colors.error : colors.textMuted}
           />
           <Text style={styles.lockedText}>
-            {completed === true ? 'Exercised' : completed === false ? 'Did not exercise' : 'Not recorded'}
+            {completed === true ? 'Fait' : completed === false ? 'Pas fait' : 'Non enregistré'}
           </Text>
         </View>
       </View>
@@ -75,14 +75,14 @@ export function ExerciseToggle({ disabled = false, selectedDate = null }: { disa
           <Ionicons name="fitness-outline" size={18} color={colors.primary} />
         </View>
         <View style={styles.headerText}>
-          <Text style={styles.title}>Weekly Exercise</Text>
+          <Text style={styles.title}>Exercice hebdo</Text>
           <View style={styles.badge}>
-            <Text style={styles.badgeText}>Sunday</Text>
+            <Text style={styles.badgeText}>Dimanche</Text>
           </View>
         </View>
       </View>
 
-      <Text style={styles.question}>Did you exercise 3 times this week?</Text>
+      <Text style={styles.question}>Avez-vous fait de l'exercice 3 fois cette semaine ?</Text>
 
       <View style={styles.toggleContainer}>
         <TouchableOpacity
@@ -104,7 +104,7 @@ export function ExerciseToggle({ disabled = false, selectedDate = null }: { disa
               completed === true && styles.toggleTextActive,
             ]}
           >
-            Yes
+            Oui
           </Text>
         </TouchableOpacity>
 
@@ -127,7 +127,7 @@ export function ExerciseToggle({ disabled = false, selectedDate = null }: { disa
               completed === false && styles.toggleTextActive,
             ]}
           >
-            No
+            Non
           </Text>
         </TouchableOpacity>
       </View>

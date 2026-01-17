@@ -26,7 +26,7 @@ export default function ResetPasswordScreen() {
 
   const handleResetPassword = async () => {
     if (!email.trim()) {
-      setError('Please enter your email address');
+      setError('Veuillez entrer votre adresse email');
       return;
     }
 
@@ -38,7 +38,7 @@ export default function ResetPasswordScreen() {
     setIsLoading(false);
 
     if (resetError) {
-      setError(resetError.message || 'Failed to send reset email');
+      setError(resetError.message || 'Échec de l\'envoi de l\'email de réinitialisation');
     } else {
       setSuccess(true);
     }
@@ -52,17 +52,16 @@ export default function ResetPasswordScreen() {
             <View style={styles.successIcon}>
               <Ionicons name="mail-outline" size={48} color={colors.primary} />
             </View>
-            <Text style={styles.successTitle}>Check Your Email</Text>
+            <Text style={styles.successTitle}>Vérifiez votre email</Text>
             <Text style={styles.successText}>
-              We've sent a password reset link to {email}. Click the link in the
-              email to reset your password.
+              Nous avons envoyé un lien de réinitialisation à {email}. Cliquez sur le lien dans l'email pour réinitialiser votre mot de passe.
             </Text>
             <TouchableOpacity
               style={styles.button}
               onPress={() => router.back()}
               activeOpacity={0.8}
             >
-              <Text style={styles.buttonText}>Back to Login</Text>
+              <Text style={styles.buttonText}>Retour à la connexion</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -85,10 +84,9 @@ export default function ResetPasswordScreen() {
           </TouchableOpacity>
 
           <View style={styles.header}>
-            <Text style={styles.title}>Reset Password</Text>
+            <Text style={styles.title}>Réinitialiser le mot de passe</Text>
             <Text style={styles.subtitle}>
-              Enter your email address and we'll send you a link to reset your
-              password.
+              Entrez votre adresse email et nous vous enverrons un lien pour réinitialiser votre mot de passe.
             </Text>
           </View>
 
@@ -103,7 +101,7 @@ export default function ResetPasswordScreen() {
               <Text style={styles.label}>Email</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter your email"
+                placeholder="Entrez votre email"
                 placeholderTextColor={colors.textMuted}
                 value={email}
                 onChangeText={setEmail}
@@ -125,7 +123,7 @@ export default function ResetPasswordScreen() {
               {isLoading ? (
                 <ActivityIndicator color={colors.card} />
               ) : (
-                <Text style={styles.buttonText}>Send Reset Link</Text>
+                <Text style={styles.buttonText}>Envoyer le lien</Text>
               )}
             </TouchableOpacity>
           </View>

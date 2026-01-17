@@ -29,7 +29,7 @@ export function MealSelector({
   onSelect,
   disabled = false,
 }: MealSelectorProps) {
-  const mealLabel = mealType === 'lunch' ? 'Lunch' : 'Dinner';
+  const mealLabel = mealType === 'lunch' ? 'Déjeuner' : 'Dîner';
 
   return (
     <View style={styles.container}>

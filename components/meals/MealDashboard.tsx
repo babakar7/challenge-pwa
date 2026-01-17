@@ -44,10 +44,10 @@ export function MealDashboard({
   // Format week start date
   const formatWeekStart = (date: Date | null | undefined): string => {
     if (!date) return '';
-    return date.toLocaleDateString('en-US', {
+    return date.toLocaleDateString('fr-FR', {
       weekday: 'long',
-      month: 'short',
       day: 'numeric',
+      month: 'long',
     });
   };
 
@@ -70,7 +70,7 @@ export function MealDashboard({
               onPress={() => onWeekChange(week)}
             >
               <Text style={[styles.tabText, activeWeek === week && styles.tabTextActive]}>
-                Week {week}
+                Semaine {week}
               </Text>
               <Ionicons
                 name="checkmark-circle"
@@ -87,14 +87,14 @@ export function MealDashboard({
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Your Week {activeWeek} Meals</Text>
+          <Text style={styles.title}>Vos repas semaine {activeWeek}</Text>
           <View style={styles.statusRow}>
             <View style={styles.statusBadge}>
               <Ionicons name="lock-closed" size={12} color={colors.success} />
-              <Text style={styles.statusText}>Locked</Text>
+              <Text style={styles.statusText}>Verrouillé</Text>
             </View>
             {weekStartDate && (
-              <Text style={styles.dateText}>Starts {formatWeekStart(weekStartDate)}</Text>
+              <Text style={styles.dateText}>Commence le {formatWeekStart(weekStartDate)}</Text>
             )}
           </View>
         </View>
@@ -111,23 +111,23 @@ export function MealDashboard({
                 <Text style={styles.dayName}>
                   {cohortStartDate
                     ? getWeekdayNameForChallengeDay(cohortStartDate, activeWeek, day)
-                    : `Day ${day}`}
+                    : `Jour ${day}`}
                 </Text>
                 <View style={styles.mealsContainer}>
                   <View style={styles.mealRow}>
-                    <Text style={styles.mealTypeLabel}>Lunch</Text>
+                    <Text style={styles.mealTypeLabel}>Déj</Text>
                     <Text style={styles.mealName}>
                       {lunchSelection
                         ? getMealName(day, 'lunch', lunchSelection)
-                        : 'Not selected'}
+                        : 'Non sélectionné'}
                     </Text>
                   </View>
                   <View style={styles.mealRow}>
-                    <Text style={styles.mealTypeLabel}>Dinner</Text>
+                    <Text style={styles.mealTypeLabel}>Dîner</Text>
                     <Text style={styles.mealName}>
                       {dinnerSelection
                         ? getMealName(day, 'dinner', dinnerSelection)
-                        : 'Not selected'}
+                        : 'Non sélectionné'}
                     </Text>
                   </View>
                 </View>
@@ -143,7 +143,7 @@ export function MealDashboard({
             size={20}
             color={colors.primary}
           />
-          <Text style={styles.deliveryText}>Home Delivery</Text>
+          <Text style={styles.deliveryText}>Livraison à domicile</Text>
         </View>
 
         {/* CTA Button or Completion Message */}
@@ -151,14 +151,14 @@ export function MealDashboard({
           {allWeeksLocked ? (
             <View style={styles.completionCard}>
               <Ionicons name="checkmark-circle" size={32} color={colors.success} />
-              <Text style={styles.completionTitle}>All Meals Selected!</Text>
+              <Text style={styles.completionTitle}>Tous les repas sélectionnés !</Text>
               <Text style={styles.completionText}>
-                You've completed meal selections for all {totalWeeks} weeks of your challenge.
+                Vous avez complété les sélections de repas pour les {totalWeeks} semaines de votre défi.
               </Text>
             </View>
           ) : nextUnlockedWeek ? (
             <Button
-              title={`Select Week ${nextUnlockedWeek} Meals →`}
+              title={`Sélectionner repas semaine ${nextUnlockedWeek} →`}
               onPress={onSelectNextWeek}
               size="lg"
               fullWidth

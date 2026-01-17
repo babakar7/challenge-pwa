@@ -47,8 +47,8 @@ export function BreakfastPhoto({ disabled = false, selectedDate = null }: Breakf
             <ActivityIndicator size="small" color={colors.breakfast} />
           </View>
           <View style={styles.content}>
-            <Text style={styles.label}>Breakfast Photo</Text>
-            <Text style={styles.uploadingText}>Uploading...</Text>
+            <Text style={styles.label}>Photo petit-déjeuner</Text>
+            <Text style={styles.uploadingText}>Téléchargement...</Text>
           </View>
         </View>
       </View>
@@ -75,9 +75,9 @@ export function BreakfastPhoto({ disabled = false, selectedDate = null }: Breakf
             )}
           </View>
           <View style={styles.content}>
-            <Text style={styles.label}>Breakfast Photo</Text>
+            <Text style={styles.label}>Photo petit-déjeuner</Text>
             <Text style={styles.uploadedTime}>
-              Uploaded {photo?.uploaded_at ? formatUploadTime(photo.uploaded_at) : ''}
+              Téléchargé à {photo?.uploaded_at ? formatUploadTime(photo.uploaded_at) : ''}
             </Text>
           </View>
           <View style={styles.lockedBadge}>
@@ -97,8 +97,8 @@ export function BreakfastPhoto({ disabled = false, selectedDate = null }: Breakf
             <Ionicons name="camera-outline" size={20} color={colors.breakfast} />
           </View>
           <View style={styles.content}>
-            <Text style={styles.label}>Breakfast Photo</Text>
-            <Text style={styles.helperText}>No photo added</Text>
+            <Text style={styles.label}>Photo petit-déjeuner</Text>
+            <Text style={styles.helperText}>Aucune photo</Text>
           </View>
           <View style={styles.lockedBadge}>
             <Ionicons name="lock-closed" size={12} color={colors.textMuted} />
@@ -128,9 +128,9 @@ export function BreakfastPhoto({ disabled = false, selectedDate = null }: Breakf
             )}
           </TouchableOpacity>
           <View style={styles.content}>
-            <Text style={styles.label}>Breakfast Photo</Text>
+            <Text style={styles.label}>Photo petit-déjeuner</Text>
             <Text style={styles.uploadedTime}>
-              Uploaded {photo?.uploaded_at ? formatUploadTime(photo.uploaded_at) : ''}
+              Téléchargé à {photo?.uploaded_at ? formatUploadTime(photo.uploaded_at) : ''}
             </Text>
           </View>
           <TouchableOpacity style={styles.editButton} onPress={showPicker}>
@@ -149,11 +149,11 @@ export function BreakfastPhoto({ disabled = false, selectedDate = null }: Breakf
           <Ionicons name="camera-outline" size={20} color={colors.breakfast} />
         </View>
         <View style={styles.content}>
-          <Text style={styles.label}>Breakfast Photo</Text>
+          <Text style={styles.label}>Photo petit-déjeuner</Text>
           <View style={styles.helperRow}>
-            <Text style={styles.helperText}>Tap to add</Text>
+            <Text style={styles.helperText}>Appuyez pour ajouter</Text>
             <View style={styles.optionalBadge}>
-              <Text style={styles.optionalText}>Optional</Text>
+              <Text style={styles.optionalText}>Optionnel</Text>
             </View>
           </View>
         </View>

@@ -39,7 +39,7 @@ export function DayMealSelector({
   // Get day name based on actual cohort start date
   const dayName = cohortStartDate
     ? getWeekdayNameForChallengeDay(cohortStartDate, weekNumber, currentDay)
-    : `Day ${currentDay}`;
+    : `Jour ${currentDay}`;
 
   // Get meal options for this day
   const lunchOptions = mealOptions.find(
@@ -72,7 +72,7 @@ export function DayMealSelector({
       >
         {/* Day Header */}
         <View style={styles.dayHeader}>
-          <Text style={styles.dayNumber}>DAY {currentDay}</Text>
+          <Text style={styles.dayNumber}>JOUR {currentDay}</Text>
           <Text style={styles.dayName}>{dayName}</Text>
         </View>
 
@@ -139,7 +139,7 @@ export function DayMealSelector({
         <View style={styles.navButtons}>
           <View style={styles.navButton}>
             <Button
-              title="◀ Previous"
+              title="◀ Précédent"
               onPress={onPrevious}
               disabled={!canGoPrevious}
               variant="outline"
@@ -148,7 +148,7 @@ export function DayMealSelector({
 
           <View style={styles.navButton}>
             <Button
-              title="Next ▶"
+              title="Suivant ▶"
               onPress={handleNext}
               disabled={!hasBothMealsSelected}
               variant="primary"
@@ -159,8 +159,8 @@ export function DayMealSelector({
         {/* Day Progress Label */}
         <Text style={styles.progressLabel}>
           {hasBothMealsSelected
-            ? `Day ${currentDay} of 7`
-            : 'Select both lunch and dinner to continue'}
+            ? `Jour ${currentDay} sur 7`
+            : 'Sélectionnez déjeuner et dîner pour continuer'}
         </Text>
       </View>
     </View>

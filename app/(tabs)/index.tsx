@@ -2,6 +2,7 @@ import { ScrollView, View, Text, StyleSheet, RefreshControl, Pressable } from 'r
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -27,7 +28,7 @@ const MILESTONE_STORAGE_KEY = 'lastCelebratedStreak';
 
 export default function DashboardScreen() {
   const [refreshing, setRefreshing] = useState(false);
-  const today = format(new Date(), 'EEEE, MMMM d');
+  const today = format(new Date(), 'EEEE d MMMM', { locale: fr });
   const confettiRef = useRef<ConfettiCelebrationRef>(null);
 
   const cohort = useAppStore(s => s.cohort);
@@ -106,7 +107,7 @@ export default function DashboardScreen() {
         }
       >
         <View style={styles.header}>
-          <Text style={styles.greeting}>Good {getGreeting()}</Text>
+          <Text style={styles.greeting}>{getGreeting()}</Text>
           <Text style={styles.date}>{today}</Text>
         </View>
 
@@ -126,10 +127,10 @@ export default function DashboardScreen() {
 
         <CheckInButton disabled={isEnded || hasCheckedInForSelectedDate} selectedDate={selectedDate} />
 
-        <Text style={styles.sectionTitle}>Breakfast</Text>
+        <Text style={styles.sectionTitle}>Petit-déjeuner</Text>
         <BreakfastPhoto disabled={isEnded || hasCheckedInForSelectedDate} selectedDate={selectedDate} />
 
-        <Text style={styles.sectionTitle}>Daily Log</Text>
+        <Text style={styles.sectionTitle}>Journal quotidien</Text>
 
         <View style={styles.cards}>
           <WeightInput disabled={isEnded || hasCheckedInForSelectedDate} selectedDate={selectedDate} />
@@ -140,7 +141,7 @@ export default function DashboardScreen() {
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Log your progress to unlock check-in
+            Enregistrez vos progrès pour débloquer le bilan
           </Text>
         </View>
         </ScrollView>
@@ -154,9 +155,9 @@ export default function DashboardScreen() {
 
 function getGreeting() {
   const hour = new Date().getHours();
-  if (hour < 12) return 'morning';
-  if (hour < 17) return 'afternoon';
-  return 'evening';
+  if (hour < 12) return 'Bonjour';
+  if (hour < 17) return 'Bon après-midi';
+  return 'Bonsoir';
 }
 
 const styles = StyleSheet.create({

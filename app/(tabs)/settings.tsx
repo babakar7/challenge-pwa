@@ -25,12 +25,12 @@ export default function SettingsScreen() {
 
   const handleLogout = async () => {
     Alert.alert(
-      'Log Out',
-      'Are you sure you want to log out?',
+      'Se déconnecter',
+      'Êtes-vous sûr de vouloir vous déconnecter ?',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'Annuler', style: 'cancel' },
         {
-          text: 'Log Out',
+          text: 'Se déconnecter',
           style: 'destructive',
           onPress: async () => {
             setIsLoggingOut(true);
@@ -41,12 +41,12 @@ export default function SettingsScreen() {
               // Sign out from Supabase
               const { error } = await signOut();
               if (error) {
-                Alert.alert('Error', 'Failed to log out. Please try again.');
+                Alert.alert('Erreur', 'Échec de la déconnexion. Veuillez réessayer.');
                 logger.error('Logout error:', error);
               }
               // Auth state change listener will handle navigation
             } catch (error) {
-              Alert.alert('Error', 'Failed to log out. Please try again.');
+              Alert.alert('Erreur', 'Échec de la déconnexion. Veuillez réessayer.');
               logger.error('Logout error:', error);
             } finally {
               setIsLoggingOut(false);
@@ -59,22 +59,22 @@ export default function SettingsScreen() {
 
   const handleDeleteAccount = async () => {
     Alert.alert(
-      'Delete Account',
-      'This will permanently delete all your data including weight history, check-ins, meal selections, and progress. This action cannot be undone.',
+      'Supprimer le compte',
+      'Ceci supprimera définitivement toutes vos données, y compris l\'historique de poids, les bilans, les sélections de repas et les progrès. Cette action est irréversible.',
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: 'Annuler', style: 'cancel' },
         {
-          text: 'Delete Account',
+          text: 'Supprimer le compte',
           style: 'destructive',
           onPress: () => {
             // Second confirmation
             Alert.alert(
-              'Are you absolutely sure?',
-              'All your challenge data will be permanently deleted.',
+              'Êtes-vous absolument sûr ?',
+              'Toutes vos données de défi seront définitivement supprimées.',
               [
-                { text: 'Cancel', style: 'cancel' },
+                { text: 'Annuler', style: 'cancel' },
                 {
-                  text: 'Yes, Delete Everything',
+                  text: 'Oui, tout supprimer',
                   style: 'destructive',
                   onPress: async () => {
                     setIsDeletingAccount(true);
@@ -86,19 +86,19 @@ export default function SettingsScreen() {
                         // Sign out after deletion
                         await signOut();
                         Alert.alert(
-                          'Account Deleted',
-                          'Your account data has been deleted.'
+                          'Compte supprimé',
+                          'Les données de votre compte ont été supprimées.'
                         );
                       } else {
                         Alert.alert(
-                          'Error',
-                          'Failed to delete account data. Please try again.'
+                          'Erreur',
+                          'Échec de la suppression des données. Veuillez réessayer.'
                         );
                       }
                     } catch (error) {
                       Alert.alert(
-                        'Error',
-                        'Failed to delete account. Please try again.'
+                        'Erreur',
+                        'Échec de la suppression du compte. Veuillez réessayer.'
                       );
                       logger.error('Delete account error:', error);
                     } finally {
@@ -119,13 +119,13 @@ export default function SettingsScreen() {
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <View style={styles.header}>
-            <Text style={styles.title}>Settings</Text>
+            <Text style={styles.title}>Paramètres</Text>
           </View>
 
           <View style={styles.content}>
         {/* Account Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Account</Text>
+          <Text style={styles.sectionTitle}>Compte</Text>
 
           <View style={styles.card}>
             <View style={styles.row}>
@@ -134,7 +134,7 @@ export default function SettingsScreen() {
               </View>
               <View style={styles.rowContent}>
                 <Text style={styles.rowLabel}>Email</Text>
-                <Text style={styles.rowValue}>{user?.email || 'Not logged in'}</Text>
+                <Text style={styles.rowValue}>{user?.email || 'Non connecté'}</Text>
               </View>
             </View>
           </View>
@@ -160,7 +160,7 @@ export default function SettingsScreen() {
               </View>
               <View style={styles.rowContent}>
                 <Text style={[styles.rowLabel, styles.logoutText]}>
-                  {isLoggingOut ? 'Logging out...' : 'Log Out'}
+                  {isLoggingOut ? 'Déconnexion...' : 'Se déconnecter'}
                 </Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
@@ -170,7 +170,7 @@ export default function SettingsScreen() {
 
         {/* Danger Zone Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Danger Zone</Text>
+          <Text style={styles.sectionTitle}>Zone danger</Text>
 
           <TouchableOpacity
             style={styles.card}
@@ -188,10 +188,10 @@ export default function SettingsScreen() {
               </View>
               <View style={styles.rowContent}>
                 <Text style={[styles.rowLabel, styles.logoutText]}>
-                  {isDeletingAccount ? 'Deleting...' : 'Delete Account'}
+                  {isDeletingAccount ? 'Suppression...' : 'Supprimer le compte'}
                 </Text>
                 <Text style={styles.rowValue}>
-                  Permanently delete all your data
+                  Supprimer définitivement toutes vos données
                 </Text>
               </View>
               <Ionicons name="chevron-forward" size={20} color={colors.textMuted} />
@@ -201,7 +201,7 @@ export default function SettingsScreen() {
 
         {/* App Info Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About</Text>
+          <Text style={styles.sectionTitle}>À propos</Text>
 
           <View style={styles.card}>
             <View style={styles.row}>
@@ -218,7 +218,7 @@ export default function SettingsScreen() {
 
         {/* Legal Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Legal</Text>
+          <Text style={styles.sectionTitle}>Légal</Text>
 
           <View style={styles.card}>
             <TouchableOpacity
@@ -230,7 +230,7 @@ export default function SettingsScreen() {
                 <Ionicons name="shield-checkmark-outline" size={20} color={colors.primary} />
               </View>
               <View style={styles.rowContent}>
-                <Text style={styles.rowLabel}>Privacy Policy</Text>
+                <Text style={styles.rowLabel}>Politique de confidentialité</Text>
               </View>
               <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
             </TouchableOpacity>
@@ -246,7 +246,7 @@ export default function SettingsScreen() {
                 <Ionicons name="document-text-outline" size={20} color={colors.primary} />
               </View>
               <View style={styles.rowContent}>
-                <Text style={styles.rowLabel}>Terms of Service</Text>
+                <Text style={styles.rowLabel}>Conditions d'utilisation</Text>
               </View>
               <Ionicons name="chevron-forward" size={18} color={colors.textMuted} />
             </TouchableOpacity>

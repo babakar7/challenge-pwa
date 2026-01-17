@@ -1,4 +1,5 @@
 import { addDays, differenceInDays, differenceInHours, isBefore, parseISO, format, getDay } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 /**
  * Challenge Week Information
@@ -119,7 +120,7 @@ export function getWeeksNeedingSelection(currentChallengeDay: number, totalWeeks
  * Format deadline for display
  */
 export function formatDeadline(deadline: Date): string {
-  return format(deadline, "EEEE, MMM d 'at' h:mm a");
+  return format(deadline, "EEEE d MMM 'à' HH:mm", { locale: fr });
 }
 
 /**
@@ -130,25 +131,25 @@ export function getDeadlineCountdown(deadline: Date): string {
   const hoursUntil = differenceInHours(deadline, now);
 
   if (hoursUntil < 0) {
-    return 'Deadline passed';
+    return 'Délai dépassé';
   }
 
   if (hoursUntil < 1) {
-    return 'Less than 1 hour';
+    return 'Moins d\'1 heure';
   }
 
   if (hoursUntil < 24) {
-    return `${hoursUntil} hour${hoursUntil === 1 ? '' : 's'} left`;
+    return `${hoursUntil} heure${hoursUntil === 1 ? '' : 's'} restante${hoursUntil === 1 ? '' : 's'}`;
   }
 
   const daysUntil = Math.floor(hoursUntil / 24);
   const remainingHours = hoursUntil % 24;
 
   if (daysUntil === 1) {
-    return `1 day, ${remainingHours} hours left`;
+    return `1 jour, ${remainingHours} heures restantes`;
   }
 
-  return `${daysUntil} days left`;
+  return `${daysUntil} jours restants`;
 }
 
 /**
@@ -171,7 +172,7 @@ export function calculateChallengeDay(cohortStartDate: string): number {
   return differenceInDays(now, start) + 1;
 }
 
-const WEEKDAY_NAMES = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const WEEKDAY_NAMES = ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
 
 /**
  * Get the actual weekday name for a challenge day

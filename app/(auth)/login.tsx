@@ -28,7 +28,7 @@ export default function LoginScreen() {
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
-      setError('Please enter your email and password');
+      setError('Veuillez entrer votre email et mot de passe');
       return;
     }
 
@@ -44,7 +44,7 @@ export default function LoginScreen() {
 
       if (authError) {
         logger.log('Auth error:', authError);
-        setError(authError.message || 'Invalid email or password');
+        setError(authError.message || 'Email ou mot de passe invalide');
         setIsLoading(false);
       } else {
         // Login successful - load user data and redirect
@@ -58,7 +58,7 @@ export default function LoginScreen() {
       }
     } catch (e) {
       logger.error('Login exception:', e);
-      setError('An unexpected error occurred');
+      setError('Une erreur inattendue s\'est produite');
       setIsLoading(false);
     }
   };
@@ -72,9 +72,9 @@ export default function LoginScreen() {
         <View style={styles.content}>
           <View style={styles.header}>
             <Text style={styles.logo}>Revive</Text>
-            <Text style={styles.title}>Welcome Back</Text>
+            <Text style={styles.title}>Bon retour</Text>
             <Text style={styles.subtitle}>
-              Sign in to continue your challenge
+              Connectez-vous pour continuer votre défi
             </Text>
           </View>
 
@@ -89,7 +89,7 @@ export default function LoginScreen() {
               <Text style={styles.label}>Email</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter your email"
+                placeholder="Entrez votre email"
                 placeholderTextColor={colors.textMuted}
                 value={email}
                 onChangeText={setEmail}
@@ -103,10 +103,10 @@ export default function LoginScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Password</Text>
+              <Text style={styles.label}>Mot de passe</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Enter your password"
+                placeholder="Entrez votre mot de passe"
                 placeholderTextColor={colors.textMuted}
                 value={password}
                 onChangeText={setPassword}
@@ -122,7 +122,7 @@ export default function LoginScreen() {
               onPress={() => router.push('/(auth)/reset-password')}
               disabled={isLoading}
             >
-              <Text style={styles.forgotPasswordText}>Forgot password?</Text>
+              <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -134,14 +134,14 @@ export default function LoginScreen() {
               {isLoading ? (
                 <ActivityIndicator color={colors.card} />
               ) : (
-                <Text style={styles.buttonText}>Log In</Text>
+                <Text style={styles.buttonText}>Se connecter</Text>
               )}
             </TouchableOpacity>
           </View>
 
           <View style={styles.footer}>
             <Text style={styles.footerText}>
-              Don't have an account? Contact your administrator.
+              Vous n'avez pas de compte ? Contactez votre administrateur.
             </Text>
           </View>
         </View>

@@ -19,12 +19,12 @@ export function NotEnrolledScreen() {
           <Ionicons name="calendar-outline" size={80} color={colors.textMuted} />
         </View>
 
-        <Text style={styles.title}>No Active Challenge</Text>
+        <Text style={styles.title}>Pas de défi actif</Text>
         <Text style={styles.message}>
-          You are not currently enrolled in a challenge.
+          Vous n'êtes actuellement inscrit à aucun défi.
         </Text>
         <Text style={styles.submessage}>
-          Contact Revive to join the next challenge.
+          Contactez Revive pour rejoindre le prochain défi.
         </Text>
 
         <TouchableOpacity
@@ -32,7 +32,7 @@ export function NotEnrolledScreen() {
           onPress={handleLogout}
         >
           <Ionicons name="log-out-outline" size={20} color={colors.error} />
-          <Text style={styles.logoutText}>Logout</Text>
+          <Text style={styles.logoutText}>Se déconnecter</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

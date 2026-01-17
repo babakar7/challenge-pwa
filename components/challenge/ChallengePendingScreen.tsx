@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { format, parseISO, differenceInDays, differenceInHours, differenceInMinutes } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useAppStore } from '@/lib/store/appStore';
 import { colors, spacing, typography, borderRadius } from '@/lib/constants/theme';
@@ -38,7 +39,7 @@ export function ChallengePendingScreen() {
 
   if (!cohort) return null;
 
-  const formattedDate = format(parseISO(cohort.start_date), 'MMMM d, yyyy');
+  const formattedDate = format(parseISO(cohort.start_date), 'd MMMM yyyy', { locale: fr });
 
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
@@ -48,19 +49,19 @@ export function ChallengePendingScreen() {
         </View>
 
         <Text style={styles.challengeName}>{cohort.name}</Text>
-        <Text style={styles.title}>Challenge Starts Soon</Text>
+        <Text style={styles.title}>Le défi commence bientôt</Text>
         <Text style={styles.message}>
-          Your challenge begins on {formattedDate}
+          Votre défi commence le {formattedDate}
         </Text>
 
         <View style={styles.countdownContainer}>
           <View style={styles.countdownItem}>
             <Text style={styles.countdownValue}>{timeLeft.days}</Text>
-            <Text style={styles.countdownLabel}>Days</Text>
+            <Text style={styles.countdownLabel}>Jours</Text>
           </View>
           <View style={styles.countdownItem}>
             <Text style={styles.countdownValue}>{timeLeft.hours}</Text>
-            <Text style={styles.countdownLabel}>Hours</Text>
+            <Text style={styles.countdownLabel}>Heures</Text>
           </View>
           <View style={styles.countdownItem}>
             <Text style={styles.countdownValue}>{timeLeft.minutes}</Text>
@@ -69,7 +70,7 @@ export function ChallengePendingScreen() {
         </View>
 
         <Text style={styles.submessage}>
-          You'll be able to start logging your habits when the challenge begins.
+          Vous pourrez commencer à enregistrer vos habitudes lorsque le défi commencera.
         </Text>
 
         <TouchableOpacity
@@ -77,7 +78,7 @@ export function ChallengePendingScreen() {
           onPress={handleLogout}
         >
           <Ionicons name="log-out-outline" size={20} color={colors.textSecondary} />
-          <Text style={styles.logoutText}>Logout</Text>
+          <Text style={styles.logoutText}>Se déconnecter</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>

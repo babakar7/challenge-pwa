@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { colors, spacing, borderRadius, shadows } from '@/lib/constants/theme';
 import { useAppStore } from '@/lib/store/appStore';
 import { format } from 'date-fns';
+import { fr } from 'date-fns/locale';
 
 const getToday = () => new Date().toISOString().split('T')[0];
 
@@ -32,9 +33,9 @@ export function CheckInButton({ disabled = false, selectedDate = null }: { disab
         </View>
         <View style={styles.completedText}>
           <Text style={styles.completedTitle}>
-            {isToday ? 'Done for today' : `Done for ${format(new Date(targetDate), 'MMM d')}`}
+            {isToday ? 'Terminé pour aujourd\'hui' : `Terminé le ${format(new Date(targetDate), 'd MMM', { locale: fr })}`}
           </Text>
-          <Text style={styles.completedSubtitle}>Check-in complete</Text>
+          <Text style={styles.completedSubtitle}>Bilan terminé</Text>
         </View>
       </View>
     );
@@ -47,8 +48,8 @@ export function CheckInButton({ disabled = false, selectedDate = null }: { disab
           <Ionicons name="lock-closed" size={18} color={colors.textMuted} />
         </View>
         <View style={styles.lockedText}>
-          <Text style={styles.lockedTitle}>Check in</Text>
-          <Text style={styles.lockedSubtitle}>Complete your daily log first</Text>
+          <Text style={styles.lockedTitle}>Bilan</Text>
+          <Text style={styles.lockedSubtitle}>Complétez d'abord votre journal</Text>
         </View>
       </View>
     );
@@ -65,8 +66,8 @@ export function CheckInButton({ disabled = false, selectedDate = null }: { disab
           <Ionicons name="arrow-forward" size={20} color="#fff" />
         </View>
         <View style={styles.enabledText}>
-          <Text style={styles.enabledTitle}>Check in</Text>
-          <Text style={styles.enabledSubtitle}>Ready to log your day</Text>
+          <Text style={styles.enabledTitle}>Bilan</Text>
+          <Text style={styles.enabledSubtitle}>Prêt à faire le bilan</Text>
         </View>
         <Ionicons name="chevron-forward" size={20} color="rgba(255,255,255,0.6)" />
       </View>

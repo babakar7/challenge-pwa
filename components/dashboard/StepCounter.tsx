@@ -50,7 +50,7 @@ export function StepCounter({ disabled = false, selectedDate = null }: { disable
             <Ionicons name="footsteps" size={20} color={colors.steps} />
           </View>
           <View style={styles.content}>
-            <Text style={styles.label}>Steps</Text>
+            <Text style={styles.label}>Pas</Text>
             <View style={styles.valueRow}>
               <Text style={styles.value}>
                 {steps ? formatSteps(steps) : '--'}
@@ -82,7 +82,7 @@ export function StepCounter({ disabled = false, selectedDate = null }: { disable
         </View>
 
         <View style={styles.content}>
-          <Text style={styles.label}>Steps</Text>
+          <Text style={styles.label}>Pas</Text>
 
           {hasValue && !isEditing ? (
             <TouchableOpacity onPress={handleEdit} style={styles.valueRow}>
@@ -96,7 +96,7 @@ export function StepCounter({ disabled = false, selectedDate = null }: { disable
                 value={inputValue}
                 onChangeText={setInputValue}
                 onBlur={handleBlur}
-                placeholder="Enter steps"
+                placeholder="Entrez les pas"
                 placeholderTextColor={colors.textMuted}
                 keyboardType="number-pad"
                 autoFocus

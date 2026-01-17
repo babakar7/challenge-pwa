@@ -260,8 +260,8 @@ export default function MealsScreen() {
         }
       } else {
         Alert.alert(
-          'Week Not Available',
-          `Week ${prevWeek} is not yet accessible. You can only select meals for your current week and the upcoming week.`,
+          'Semaine non disponible',
+          `La semaine ${prevWeek} n'est pas encore accessible. Vous ne pouvez sélectionner les repas que pour la semaine en cours et la suivante.`,
           [{ text: 'OK' }]
         );
       }
@@ -281,8 +281,8 @@ export default function MealsScreen() {
         }
       } else {
         Alert.alert(
-          'Week Not Available',
-          `Please complete and lock your Week ${activeWeek} meal selections before accessing Week ${nextWeek}.`,
+          'Semaine non disponible',
+          `Veuillez compléter et verrouiller vos sélections de repas de la semaine ${activeWeek} avant d'accéder à la semaine ${nextWeek}.`,
           [{ text: 'OK' }]
         );
       }
@@ -293,8 +293,8 @@ export default function MealsScreen() {
   const handleSubmit = useCallback(() => {
     if (!hasAllSelectionsComplete) {
       Alert.alert(
-        'Incomplete Selection',
-        'Please select all meals and your delivery preference before submitting.',
+        'Sélection incomplète',
+        'Veuillez sélectionner tous les repas et votre préférence de livraison avant de soumettre.',
         [{ text: 'OK' }]
       );
       return;
@@ -319,13 +319,13 @@ export default function MealsScreen() {
         }, 1500);
       } else {
         Alert.alert(
-          'Error',
-          'Failed to lock selections. Please try again.',
+          'Erreur',
+          'Échec du verrouillage. Veuillez réessayer.',
           [{ text: 'OK' }]
         );
       }
     } catch (error) {
-      Alert.alert('Error', 'An error occurred. Please try again.');
+      Alert.alert('Erreur', 'Une erreur s\'est produite. Veuillez réessayer.');
     } finally {
       setIsSubmitting(false);
     }
@@ -445,10 +445,10 @@ export default function MealsScreen() {
         {/* Lock Confirmation Modal */}
         <ConfirmationModal
           visible={showLockModal}
-          title="Lock Selections"
-          message={`Once locked, you cannot change your Week ${activeWeek} meal selections. Are you sure?`}
-          confirmText="Lock Selections"
-          cancelText="Cancel"
+          title="Verrouiller les sélections"
+          message={`Une fois verrouillées, vous ne pourrez plus modifier vos sélections de repas de la semaine ${activeWeek}. Êtes-vous sûr ?`}
+          confirmText="Verrouiller"
+          cancelText="Annuler"
           onConfirm={handleConfirmLock}
           onCancel={() => setShowLockModal(false)}
         />

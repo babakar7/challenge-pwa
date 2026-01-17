@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { format, parseISO } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { Button } from '@/components/ui/Button';
 import { DeadlineWarning } from './DeadlineWarning';
 import { colors, spacing, borderRadius, typography } from '@/lib/constants/theme';
@@ -24,7 +25,7 @@ export function MealIntroScreen({
   challengeStartDate
 }: MealIntroScreenProps) {
   const formattedStartDate = challengeStartDate
-    ? format(parseISO(challengeStartDate), 'MMMM d, yyyy')
+    ? format(parseISO(challengeStartDate), 'd MMMM yyyy', { locale: fr })
     : null;
 
   return (
@@ -51,28 +52,28 @@ export function MealIntroScreen({
           </View>
 
           {/* Title */}
-          <Text style={styles.title}>Select Your Meals</Text>
+          <Text style={styles.title}>Sélectionnez vos repas</Text>
 
           {/* Challenge Start Date - show for Week 1 */}
           {weekNumber === 1 && formattedStartDate && (
             <View style={styles.startDateBadge}>
               <Ionicons name="calendar-outline" size={16} color={colors.primary} />
               <Text style={styles.startDateText}>
-                Challenge starts {formattedStartDate}
+                Le défi commence le {formattedStartDate}
               </Text>
             </View>
           )}
 
           {/* Checklist */}
           <View style={styles.checklist}>
-            <ChecklistItem text="Select lunch & dinner daily" />
-            <ChecklistItem text="Choose Option A or B" />
-            <ChecklistItem text="Pick your delivery method" />
-            <ChecklistItem text="Lock when ready" />
+            <ChecklistItem text="Sélectionnez déjeuner et dîner chaque jour" />
+            <ChecklistItem text="Choisissez l'option A ou B" />
+            <ChecklistItem text="Choisissez votre méthode de livraison" />
+            <ChecklistItem text="Verrouillez quand vous êtes prêt" />
           </View>
 
           {/* Get Started Button */}
-          <Button title="Get Started" onPress={onGetStarted} variant="primary" />
+          <Button title="Commencer" onPress={onGetStarted} variant="primary" />
         </View>
       </ScrollView>
     </View>

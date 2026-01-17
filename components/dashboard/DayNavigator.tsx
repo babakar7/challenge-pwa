@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { format, addDays, parseISO } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { useAppStore } from '@/lib/store/appStore';
 import { colors, spacing, typography, borderRadius } from '@/lib/constants/theme';
 
@@ -19,7 +20,7 @@ export function DayNavigator() {
 
   // Calculate date to display
   const currentDate = selectedDate ? new Date(selectedDate) : new Date();
-  const dateDisplay = isToday ? 'Today' : format(currentDate, 'MMM d');
+  const dateDisplay = isToday ? 'Aujourd\'hui' : format(currentDate, 'd MMM', { locale: fr });
 
   // Navigation handlers
   const goToPreviousDay = () => {
@@ -64,10 +65,10 @@ export function DayNavigator() {
       </TouchableOpacity>
 
       <View style={styles.dayInfo}>
-        <Text style={styles.dayNumber}>Day {dayNumber} of 28</Text>
+        <Text style={styles.dayNumber}>Jour {dayNumber} sur 28</Text>
         <Text style={styles.dateDisplay}>{dateDisplay}</Text>
         {!isToday && (
-          <Text style={styles.viewingPastLabel}>Viewing past day</Text>
+          <Text style={styles.viewingPastLabel}>Jour passé</Text>
         )}
       </View>
 

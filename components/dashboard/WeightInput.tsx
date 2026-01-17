@@ -46,7 +46,7 @@ export function WeightInput({ disabled = false, selectedDate = null }: { disable
             <Ionicons name="scale-outline" size={20} color={colors.weight} />
           </View>
           <View style={styles.content}>
-            <Text style={styles.label}>Weight</Text>
+            <Text style={styles.label}>Poids</Text>
             <View style={styles.valueRow}>
               <Text style={styles.value}>{weight ?? '--'}</Text>
               <Text style={styles.unit}>kg</Text>
@@ -68,7 +68,7 @@ export function WeightInput({ disabled = false, selectedDate = null }: { disable
         </View>
 
         <View style={styles.content}>
-          <Text style={styles.label}>Weight</Text>
+          <Text style={styles.label}>Poids</Text>
 
           {hasValue && !isEditing ? (
             <TouchableOpacity onPress={handleEdit} style={styles.valueRow}>
@@ -83,7 +83,7 @@ export function WeightInput({ disabled = false, selectedDate = null }: { disable
                 value={inputValue}
                 onChangeText={setInputValue}
                 onBlur={handleBlur}
-                placeholder="Enter weight"
+                placeholder="Entrez le poids"
                 placeholderTextColor={colors.textMuted}
                 keyboardType="decimal-pad"
                 autoFocus

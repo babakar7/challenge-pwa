@@ -52,30 +52,30 @@ export function MealReviewScreen({
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Review Your Selections</Text>
+          <Text style={styles.title}>Vérifiez vos sélections</Text>
           <Text style={styles.subtitle}>
-            Check your meal choices for Week {weekNumber} before locking.
+            Vérifiez vos choix de repas pour la semaine {weekNumber} avant de verrouiller.
           </Text>
         </View>
 
         {/* Meal Selections Summary */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Meal Choices</Text>
+          <Text style={styles.sectionTitle}>Choix de repas</Text>
 
           {daySelections.map(({ day, lunch, dinner }) => (
             <View key={day} style={styles.dayRow}>
               <View style={styles.dayInfo}>
-                <Text style={styles.dayLabel}>Day {day}</Text>
+                <Text style={styles.dayLabel}>Jour {day}</Text>
                 <Text style={styles.dayName}>
                   {cohortStartDate
                     ? getWeekdayNameForChallengeDay(cohortStartDate, weekNumber, day)
-                    : `Day ${day}`}
+                    : `Jour ${day}`}
                 </Text>
               </View>
 
               <View style={styles.mealsInfo}>
                 <View style={styles.mealRow}>
-                  <Text style={styles.mealType}>Lunch:</Text>
+                  <Text style={styles.mealType}>Déj :</Text>
                   <Text
                     style={[
                       styles.mealOption,
@@ -86,7 +86,7 @@ export function MealReviewScreen({
                   </Text>
                 </View>
                 <View style={styles.mealRow}>
-                  <Text style={styles.mealType}>Dinner:</Text>
+                  <Text style={styles.mealType}>Dîner :</Text>
                   <Text
                     style={[
                       styles.mealOption,
@@ -113,7 +113,7 @@ export function MealReviewScreen({
 
         {/* Delivery Preference Summary */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Delivery Method</Text>
+          <Text style={styles.sectionTitle}>Méthode de livraison</Text>
           <View style={styles.deliveryCard}>
             <View style={styles.deliveryIcon}>
               <Ionicons
@@ -122,7 +122,7 @@ export function MealReviewScreen({
                 color={colors.primary}
               />
             </View>
-            <Text style={styles.deliveryText}>Home Delivery</Text>
+            <Text style={styles.deliveryText}>Livraison à domicile</Text>
           </View>
         </View>
 
@@ -130,7 +130,7 @@ export function MealReviewScreen({
         <View style={styles.warningBox}>
           <Ionicons name="warning-outline" size={20} color={colors.warning} />
           <Text style={styles.warningText}>
-            Once locked, selections cannot be changed
+            Une fois verrouillées, les sélections ne peuvent plus être modifiées
           </Text>
         </View>
       </ScrollView>
@@ -139,12 +139,12 @@ export function MealReviewScreen({
       <View style={styles.footer}>
         <View style={styles.navButtons}>
           <View style={styles.navButton}>
-            <Button title="◀ Back" onPress={onBack} variant="outline" />
+            <Button title="◀ Retour" onPress={onBack} variant="outline" />
           </View>
 
           <View style={styles.navButton}>
             <Button
-              title={isSubmitting ? 'Confirming...' : 'Confirm Selection'}
+              title={isSubmitting ? 'Confirmation...' : 'Confirmer la sélection'}
               onPress={onLock}
               disabled={!hasAllSelections || !deliveryPreference || isSubmitting}
               variant="primary"
@@ -154,10 +154,10 @@ export function MealReviewScreen({
 
         {(!hasAllSelections || !deliveryPreference) && (
           <Text style={styles.hint}>
-            {!hasAllSelections && 'Complete all meal selections'}
-            {!hasAllSelections && !deliveryPreference && ' and '}
-            {!deliveryPreference && 'select delivery method'}
-            {' to continue'}
+            {!hasAllSelections && 'Complétez toutes les sélections de repas'}
+            {!hasAllSelections && !deliveryPreference && ' et '}
+            {!deliveryPreference && 'sélectionnez la méthode de livraison'}
+            {' pour continuer'}
           </Text>
         )}
       </View>

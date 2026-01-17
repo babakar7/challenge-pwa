@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { LineChart } from 'react-native-chart-kit';
 import { Ionicons } from '@expo/vector-icons';
 import { format, subDays, parseISO } from 'date-fns';
+import { fr } from 'date-fns/locale';
 import { Card } from '@/components/ui/Card';
 import { WebContainer } from '@/components/ui/WebContainer';
 import { colors, spacing, borderRadius, typography } from '@/lib/constants/theme';
@@ -117,22 +118,22 @@ export default function ProgressScreen() {
           contentContainerStyle={styles.content}
           showsVerticalScrollIndicator={false}
         >
-        <Text style={styles.title}>Your Progress</Text>
+        <Text style={styles.title}>Vos progrès</Text>
 
         {!hasData ? (
           <Card style={styles.emptyCard}>
             <Ionicons name="analytics-outline" size={48} color={colors.textMuted} />
-            <Text style={styles.emptyTitle}>No Data Yet</Text>
+            <Text style={styles.emptyTitle}>Pas encore de données</Text>
             <Text style={styles.emptyText}>
-              Start tracking your weight to see your progress chart here.
+              Commencez à suivre votre poids pour voir votre graphique de progression ici.
             </Text>
           </Card>
         ) : (
           <>
             {/* Weight Chart */}
             <Card style={styles.chartCard}>
-              <Text style={styles.chartTitle}>Weight Trend</Text>
-              <Text style={styles.chartSubtitle}>Last 28 days</Text>
+              <Text style={styles.chartTitle}>Évolution du poids</Text>
+              <Text style={styles.chartSubtitle}>28 derniers jours</Text>
               <LineChart
                 data={chartData}
                 width={chartWidth}
@@ -170,50 +171,50 @@ export default function ProgressScreen() {
             <View style={styles.statsGrid}>
               <StatCard
                 icon="scale-outline"
-                label="Starting"
+                label="Départ"
                 value={stats.starting ? `${stats.starting} kg` : '--'}
                 color={colors.textSecondary}
               />
               <StatCard
                 icon="fitness-outline"
-                label="Current"
+                label="Actuel"
                 value={stats.current ? `${stats.current} kg` : '--'}
                 color={colors.primary}
               />
               <StatCard
                 icon={stats.change <= 0 ? "trending-down-outline" : "trending-up-outline"}
-                label="Change"
+                label="Variation"
                 value={stats.change !== 0 ? `${stats.change > 0 ? '+' : ''}${stats.change.toFixed(1)} kg` : '--'}
                 color={stats.change < 0 ? colors.success : stats.change > 0 ? colors.error : colors.textSecondary}
               />
               <StatCard
                 icon="flame-outline"
-                label="Streak"
-                value={`${streak.current_streak} days`}
+                label="Série"
+                value={`${streak.current_streak} jours`}
                 color={colors.streak}
               />
             </View>
 
             {/* Summary Stats */}
             <Card style={styles.summaryCard}>
-              <Text style={styles.sectionTitle}>Summary</Text>
+              <Text style={styles.sectionTitle}>Résumé</Text>
               <View style={styles.summaryRow}>
                 <View style={styles.summaryItem}>
                   <Ionicons name="footsteps-outline" size={24} color={colors.steps} />
                   <Text style={styles.summaryValue}>{stats.avgSteps.toLocaleString()}</Text>
-                  <Text style={styles.summaryLabel}>Avg Steps</Text>
+                  <Text style={styles.summaryLabel}>Moy. pas</Text>
                 </View>
                 <View style={styles.divider} />
                 <View style={styles.summaryItem}>
                   <Ionicons name="checkmark-circle-outline" size={24} color={colors.success} />
                   <Text style={styles.summaryValue}>{stats.checkInCount}</Text>
-                  <Text style={styles.summaryLabel}>Check-ins</Text>
+                  <Text style={styles.summaryLabel}>Bilans</Text>
                 </View>
                 <View style={styles.divider} />
                 <View style={styles.summaryItem}>
                   <Ionicons name="calendar-outline" size={24} color={colors.primary} />
                   <Text style={styles.summaryValue}>{stats.daysTracked}</Text>
-                  <Text style={styles.summaryLabel}>Days Tracked</Text>
+                  <Text style={styles.summaryLabel}>Jours suivis</Text>
                 </View>
               </View>
             </Card>
@@ -226,8 +227,8 @@ export default function ProgressScreen() {
                     <Ionicons name="trophy" size={28} color={colors.warning} />
                   </View>
                   <View style={styles.longestStreakText}>
-                    <Text style={styles.longestStreakLabel}>Longest Streak</Text>
-                    <Text style={styles.longestStreakValue}>{streak.longest_streak} days</Text>
+                    <Text style={styles.longestStreakLabel}>Plus longue série</Text>
+                    <Text style={styles.longestStreakValue}>{streak.longest_streak} jours</Text>
                   </View>
                 </View>
               </Card>
@@ -238,12 +239,12 @@ export default function ProgressScreen() {
         {/* Recent Check-ins */}
         {recentCheckIns.length > 0 && (
           <Card style={styles.historyCard}>
-            <Text style={styles.sectionTitle}>Recent Check-ins</Text>
+            <Text style={styles.sectionTitle}>Bilans récents</Text>
             {recentCheckIns.map(([date, checkIn]) => (
               <View key={date} style={styles.historyItem}>
                 <View style={styles.historyDate}>
                   <Text style={styles.historyDateText}>
-                    {format(parseISO(date), 'MMM d')}
+                    {format(parseISO(date), 'd MMM', { locale: fr })}
                   </Text>
                 </View>
                 <View style={styles.historyContent}>
@@ -252,7 +253,7 @@ export default function ProgressScreen() {
                       {checkIn.challenges_faced}
                     </Text>
                   ) : (
-                    <Text style={styles.historyNoNotes}>No notes</Text>
+                    <Text style={styles.historyNoNotes}>Pas de notes</Text>
                   )}
                 </View>
                 <Ionicons name="checkmark-circle" size={20} color={colors.success} />
