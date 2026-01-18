@@ -1,10 +1,11 @@
 import { Tabs, Redirect, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, Platform } from 'react-native';
 import { colors } from '@/lib/constants/theme';
 import { useAuth } from '@/lib/context/AuthContext';
 import { useAppStore } from '@/lib/store/appStore';
 import { NotEnrolledScreen } from '@/components/challenge/NotEnrolledScreen';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChallengePendingScreen } from '@/components/challenge/ChallengePendingScreen';
 import { useMealSelectionGating } from '@/lib/hooks/useMealSelectionGating';
 
@@ -13,6 +14,7 @@ export default function TabLayout() {
   const challengeStatus = useAppStore(s => s.getChallengeStatus());
   const { shouldBlockDashboard, blockingReason, isChecking } = useMealSelectionGating();
   const pathname = usePathname();
+  const insets = useSafeAreaInsets();
 
   // Check if user is on the meals screen
   const isOnMealsScreen = pathname === '/meals' || pathname === '/(tabs)/meals';
@@ -71,6 +73,7 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: colors.card,
           borderTopColor: colors.border,
+          paddingBottom: Platform.OS === 'web' ? insets.bottom : undefined,
         },
       }}
     >

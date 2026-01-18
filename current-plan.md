@@ -1,205 +1,49 @@
-# Meal Tab UX Redesign - Post-Lock Flow
+# Fix PWA Viewport Cutting Issue
 
 ## Problem Statement
-After locking Week 1 selections, users see "Review Your Selections" which is confusing because:
-- They already confirmed their selections
-- It's a dead-end screen with no clear next action
-- They can't easily see their upcoming meals or navigate to Week 2
+On the PWA, the top and bottom content gets cut off when scrolling. The bottom navigation bar overlaps content and requires hard scrolling to reveal. When the bottom menu appears, it cuts text at the top.
 
-## User Preferences
-- **Meal display:** Show actual meal names (not just "Option A/B")
-- **Week navigation:** Tabs at top for switching between weeks
+## Root Cause Analysis
+The app uses `viewport-fit=cover` in the viewport meta tag, which extends content under the system UI (notches, home indicators, browser chrome). However, the CSS and layout don't compensate for this using safe-area-inset values.
 
-## Solution Overview
+**Key issues found:**
+1. `app/+html.tsx:44-50` - CSS styles don't use `env(safe-area-inset-*)` variables
+2. `app/(tabs)/_layout.tsx:71-74` - Tab bar has no bottom safe area padding
+3. `app/(tabs)/index.tsx:96` - SafeAreaView only protects top edge, not bottom
 
-### New Flow
+## Solution
 
-```
-User enters Meals tab
-    ↓
-Determine accessible weeks and locked status
-    ↓
-Is there an UNLOCKED accessible week?
-    ├─ YES → Show selection wizard for that week
-    └─ NO → Show MealDashboard (all accessible weeks are locked)
-```
+### Step 1: Update CSS in +html.tsx
+Add CSS safe-area-inset handling to the global styles to ensure the root element accounts for device safe areas:
 
-### New Component: `MealDashboard`
-
-Replaces the review screen for locked weeks. Shows:
-1. **Week Tabs** - Horizontal tabs (Week 1 ✓, Week 2 ✓, etc.) for locked weeks only
-2. **Meal Preview** - Scrollable list of 7 days with actual meal names
-3. **Delivery Info** - Home delivery or pickup indicator
-4. **CTA Button** - "Select Week X Meals" if next week is available
-
-### Dashboard Wireframe
-
-```
-┌─────────────────────────────────────────┐
-│  [ Week 1 ✓ ] [ Week 2 ✓ ]              │  ← Tabs for locked weeks
-├─────────────────────────────────────────┤
-│  Your Week 1 Meals                      │
-│  Locked • Starts Monday, Jan 13         │
-├─────────────────────────────────────────┤
-│                                         │
-│  Monday                                 │
-│  ├─ Lunch: Grilled Chicken Salad        │
-│  └─ Dinner: Teriyaki Salmon Bowl        │
-│                                         │
-│  Tuesday                                │
-│  ├─ Lunch: Mediterranean Wrap           │
-│  └─ Dinner: Beef Stir-fry               │
-│  ... (scrollable)                       │
-│                                         │
-├─────────────────────────────────────────┤
-│  Delivery: Home Delivery                │
-├─────────────────────────────────────────┤
-│                                         │
-│  ┌─────────────────────────────────┐   │
-│  │   Select Week 3 Meals →         │   │
-│  └─────────────────────────────────┘   │
-│                                         │
-└─────────────────────────────────────────┘
-```
-
----
-
-## Files to Modify/Create
-
-### 1. CREATE: `components/meals/MealDashboard.tsx`
-
-New component with:
-- Week tabs component (horizontal scroll if needed)
-- Day-by-day meal list showing actual meal names
-- Delivery preference display
-- CTA button for next week
-
-**Props:**
-```typescript
-interface MealDashboardProps {
-  lockedWeeks: number[];           // Which weeks to show tabs for
-  activeWeek: number;              // Currently viewed week
-  onWeekChange: (week: number) => void;
-  selections: Record<string, 'A' | 'B'>;
-  mealOptions: MealOption[];       // To get actual meal names
-  deliveryPreference: 'home' | 'pickup' | null;
-  canSelectNextWeek: boolean;
-  nextWeekNumber: number | null;
-  onSelectNextWeek: () => void;
+```css
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background-color: #FBF6F0;
 }
 ```
 
-### 2. MODIFY: `app/(tabs)/meals.tsx`
-
-Update the main flow logic:
-
-```typescript
-// Add new state/logic
-const showDashboard = useMemo(() => {
-  // Show dashboard if all accessible weeks are locked
-  const unlockedAccessibleWeek = accessibleWeeks.find(
-    week => !lockedWeeks.includes(week)
-  );
-  return !unlockedAccessibleWeek && lockedWeeks.length > 0;
-}, [accessibleWeeks, lockedWeeks]);
-
-// In renderContent():
-if (showDashboard) {
-  return (
-    <MealDashboard
-      lockedWeeks={lockedWeeks}
-      activeWeek={activeWeek}
-      onWeekChange={setActiveWeek}
-      selections={selections}
-      mealOptions={mealOptions}
-      deliveryPreference={deliveryPreference}
-      canSelectNextWeek={accessibleWeeks.includes(activeWeek + 1)}
-      nextWeekNumber={activeWeek < 4 ? activeWeek + 1 : null}
-      onSelectNextWeek={handleStartNextWeek}
-    />
-  );
-}
-```
-
-### 3. MODIFY: `components/meals/index.ts`
-
-Add export for new component:
-```typescript
-export { MealDashboard } from './MealDashboard';
-```
-
----
-
-## Implementation Details
-
-### Getting Actual Meal Names
-
-The `mealOptions` array contains meal details. To get the name for a selection:
+### Step 2: Add safe area padding to tab bar
+Update the `tabBarStyle` in `_layout.tsx` to include bottom padding for PWA:
 
 ```typescript
-const getMealName = (day: number, mealType: 'lunch' | 'dinner', option: 'A' | 'B') => {
-  const mealOption = mealOptions.find(
-    m => m.challenge_day === day && m.meal_type === mealType
-  );
-  if (!mealOption) return 'Unknown';
-  return option === 'A' ? mealOption.option_a_name : mealOption.option_b_name;
-};
+tabBarStyle: {
+  backgroundColor: colors.card,
+  borderTopColor: colors.border,
+  paddingBottom: Platform.OS === 'web' ? 'env(safe-area-inset-bottom)' : undefined,
+},
 ```
 
-### Week Tabs Component
-
-```typescript
-function WeekTabs({ weeks, activeWeek, onSelect }) {
-  return (
-    <View style={styles.tabContainer}>
-      {weeks.map(week => (
-        <TouchableOpacity
-          key={week}
-          style={[styles.tab, activeWeek === week && styles.activeTab]}
-          onPress={() => onSelect(week)}
-        >
-          <Text>Week {week}</Text>
-          <Ionicons name="checkmark-circle" size={16} color={colors.success} />
-        </TouchableOpacity>
-      ))}
-    </View>
-  );
-}
-```
-
-### CTA Button Logic
-
-```typescript
-// Only show CTA if:
-// 1. There's a next week (current < 4)
-// 2. Next week is accessible (current week is locked, enabling next)
-// 3. Next week is NOT already locked
-
-const showCTA = nextWeekNumber &&
-  accessibleWeeks.includes(nextWeekNumber) &&
-  !lockedWeeks.includes(nextWeekNumber);
-```
-
----
-
-## Edge Cases
-
-| Scenario | Behavior |
-|----------|----------|
-| No weeks locked | Show Week 1 intro/selection flow |
-| Week 1 locked, challenge not started | Show dashboard with Week 1 + CTA for Week 2 |
-| Week 1 locked, in Week 1 of challenge | Show dashboard with Week 1 + CTA for Week 2 |
-| All 4 weeks locked | Show dashboard, no CTA, message "All meals selected!" |
-| Viewing Week 1 but Week 3 is next to select | Show CTA "Select Week 3 Meals" |
-
----
+## Files to Modify
+1. `revive-challenge/app/+html.tsx` - Add safe-area-inset CSS
+2. `revive-challenge/app/(tabs)/_layout.tsx` - Add tab bar bottom padding
 
 ## Verification Steps
-
-1. **Lock Week 1** → Verify dashboard appears (not review screen)
-2. **Check meal names** → Verify actual names shown (not Option A/B)
-3. **Week tabs** → Verify tabs only show locked weeks
-4. **CTA button** → Verify "Select Week 2 Meals" appears and works
-5. **Tab switching** → Verify can view different locked weeks
-6. **All weeks locked** → Verify no CTA, shows completion message
-7. **Return to tab** → Verify dashboard persists on return
+1. Build and deploy the PWA
+2. Test on mobile device (iOS Safari, Chrome Android)
+3. Verify bottom navigation doesn't overlap content
+4. Verify scrolling to bottom shows all content without extra effort
+5. Verify top content isn't cut off when bottom nav appears
