@@ -38,6 +38,7 @@ export default function DashboardScreen() {
   const daysRemaining = useAppStore(s => s.getChallengeDaysRemaining());
   const selectedDate = useAppStore(s => s.selectedDate);
   const hasCheckedInForSelectedDate = useAppStore(s => s.hasCheckedInForSelectedDate());
+  const userName = useAppStore(s => s.userName);
 
   // Meal selection gating
   const { showDeadlineBanner, bannerUrgency, weekNeedingSelection, nextWeekInfo } = useMealSelectionGating();
@@ -107,7 +108,9 @@ export default function DashboardScreen() {
         }
       >
         <View style={styles.header}>
-          <Text style={styles.greeting}>{getGreeting()}</Text>
+          <Text style={styles.greeting}>
+            {getGreeting()}{userName ? `, ${userName.split(' ')[0]}` : ''}
+          </Text>
           <Text style={styles.date}>{today}</Text>
         </View>
 

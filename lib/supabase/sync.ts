@@ -78,13 +78,21 @@ class DataSync {
       // Transform and load into store
       const store = useAppStore.getState();
 
-      // Load cohort
+      // Load cohort and user name
       if (profileResult.data?.cohorts) {
         useAppStore.setState({ cohort: profileResult.data.cohorts as any });
         logger.log('loadUserData: Cohort loaded:', profileResult.data.cohorts);
       } else {
         useAppStore.setState({ cohort: null });
         logger.log('loadUserData: No cohort assigned');
+      }
+
+      // Load user name from profile
+      if (profileResult.data?.full_name) {
+        useAppStore.setState({ userName: profileResult.data.full_name });
+        logger.log('loadUserData: User name loaded:', profileResult.data.full_name);
+      } else {
+        useAppStore.setState({ userName: null });
       }
 
       // Load habits
@@ -170,6 +178,7 @@ class DataSync {
       mealSelections: {},
       weightHistory: [],
       cohort: null,
+      userName: null,
       breakfastPhotos: {},
     });
   }

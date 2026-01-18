@@ -86,6 +86,9 @@ interface AppState {
   // Cohort/Challenge info
   cohort: Cohort | null;
 
+  // User profile
+  userName: string | null;
+
   // Day navigation - for viewing/editing past days
   selectedDate: string | null; // null = today, string = 'YYYY-MM-DD'
 
@@ -149,6 +152,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   mealSelections: {},
   weightHistory: [],
   cohort: null,
+  userName: null,
   selectedDate: null, // null = viewing today
   breakfastPhotos: {},
 
